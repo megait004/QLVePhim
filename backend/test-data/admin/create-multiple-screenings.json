@@ -1,0 +1,23 @@
+[
+    {
+        "movieId": 1,
+        "startTime": "2024-03-20T10:00:00",
+        "hallNumber": "HALL_1",
+        "price": 100000,
+        "availableSeats": 100
+    },
+    {
+        "movieId": 1,
+        "startTime": "2024-03-20T13:00:00",
+        "hallNumber": "HALL_2",
+        "price": 120000,
+        "availableSeats": 80
+    },
+    {
+        "movieId": 1,
+        "startTime": "2024-03-20T16:00:00",
+        "hallNumber": "HALL_3",
+        "price": 150000,
+        "availableSeats": 120
+    }
+]

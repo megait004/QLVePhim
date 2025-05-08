@@ -1,0 +1,11 @@
+{
+    "title": "Avengers: Endgame1",
+    "description": "After the devastating events of Avengers: Infinity War, the universe is in ruins.",
+    "genre": "ACTION",
+    "duration": 180,
+    "releaseDate": "2024-03-01",
+    "director": "Anthony and Joe Russo1232443",
+    "movieCast": "Robert Downey Jr., Chris Evans, Mark Ruffalo",
+    "posterUrl": "https://example.com/avengers-endgame.jpg",
+    "isShowing": true
+}

@@ -1,0 +1,7 @@
+{
+    "movieId": 2,
+    "startTime": "2024-03-20T18:00:00",
+    "hallNumber": "HALL_1",
+    "price": 10.0,
+    "availableSeats": 10000000
+}

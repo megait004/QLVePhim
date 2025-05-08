@@ -1,0 +1,17 @@
+[
+    {
+        "userId": 5,
+        "screeningId": 2,
+        "seatNumber": "A1"
+    },
+    {
+        "userId": 5,
+        "screeningId": 2,
+        "seatNumber": "A2"
+    },
+    {
+        "userId": 5,
+        "screeningId": 2,
+        "seatNumber": "A3"
+    }
+]
