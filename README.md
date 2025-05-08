@@ -97,8 +97,3 @@ Frontend sẽ được xây dựng bằng React và bao gồm:
 3. Commit thay đổi (`git commit -m 'Thêm tính năng mới'`)
 4. Push lên nhánh (`git push origin feature/TinhNangMoi`)
 5. Tạo Pull Request
-
-## Liên Hệ
-Nếu bạn có bất kỳ câu hỏi hoặc góp ý nào, vui lòng liên hệ:
-- Email: [your-email@example.com]
-- GitHub Issues: Tạo issue mới trong repository
