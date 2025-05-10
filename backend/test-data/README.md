@@ -1,152 +1,168 @@
-# API Testing Guide
+# Hướng dẫn Kiểm thử API
 
-## Directory Structure
+## Cấu trúc Thư mục
 ```
 test-data/
-├── admin/           # Test data for admin operations
+├── admin/           # Dữ liệu kiểm thử cho thao tác admin
 │   ├── register-admin.json
 │   ├── create-movie.json
 │   ├── update-movie.json
 │   ├── create-screening.json
 │   └── create-multiple-screenings.json
-├── user/            # Test data for user operations
+├── user/            # Dữ liệu kiểm thử cho thao tác người dùng
 │   ├── register.json
 │   ├── login.json
 │   ├── update-user.json
 │   ├── book-ticket.json
 │   ├── book-multiple-tickets.json
 │   └── update-ticket-status.json
-└── public/          # Test data for public operations
+└── public/          # Dữ liệu kiểm thử cho thao tác công khai
     └── search-movies.json
 ```
 
-## Setup
-1. Start the application
-2. Set your JWT token as an environment variable:
+## Cài đặt
+1. Khởi động ứng dụng
+2. Đặt token JWT của bạn như một biến môi trường:
 ```cmd
-set TOKEN= token của admin hoặc user
+set TOKEN=token của admin hoặc user
+```
 
-## Test Scenarios
+## Các Kịch bản Kiểm thử
 
-### 1. Public Operations (No Authentication Required)
+### 1. Thao tác Công khai (Không yêu cầu xác thực)
 
-#### 1.1 Movie Operations
+#### 1.1 Thao tác với Phim
 ```cmd
-# Get all movies
+# Lấy tất cả phim
 curl -X GET http://localhost:8080/api/movies/public/all
 
-# Get now showing movies
+# Lấy phim đang chiếu
 curl -X GET http://localhost:8080/api/movies/public/now-showing
 
-# Get movies by genre
-curl -X GET http://localhost:8080/api/movies/public/genre/ACTION
+# Lấy phim theo thể loại
+curl -X GET http://localhost:8080/api/movies/public/genre/Action
 
-# Get movie details
+# Lấy chi tiết phim
 curl -X GET http://localhost:8080/api/movies/public/1
 
-# Search movies
+# Tìm kiếm phim
 curl -X POST http://localhost:8080/api/movies/public/search -H "Content-Type: application/json" -d @test-data/public/search-movies.json
 ```
 
-### 2. User Operations (Authentication Required)
+### 2. Thao tác Người dùng (Yêu cầu xác thực)
 
-#### 2.1 Authentication
+#### 2.1 Xác thực
 ```cmd
-# Register new user
+# Đăng ký người dùng mới
 curl -X POST http://localhost:8080/api/auth/register -H "Content-Type: application/json" -d @test-data/user/register.json
 
-# Login
+# Đăng nhập
 curl -X POST http://localhost:8080/api/auth/login -H "Content-Type: application/json" -d @test-data/user/login.json
 
-# Update profile
+# Cập nhật thông tin cá nhân
 curl -X PUT http://localhost:8080/api/users/profile -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d @test-data/user/update-user.json
+
+# Lấy thông tin cá nhân
+curl -X GET http://localhost:8080/api/users/profile -H "Authorization: Bearer %TOKEN%"
 ```
 
-#### 2.2 Ticket Operations
+#### 2.2 Thao tác với Vé
 ```cmd
-# Book single ticket
+# Đặt một vé
 curl -X POST http://localhost:8080/api/tickets/book -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d @test-data/user/book-ticket.json
 
-# Book multiple tickets
+# Đặt nhiều vé
 curl -X POST http://localhost:8080/api/tickets/book/batch -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d @test-data/user/book-multiple-tickets.json
 
-# Get user's tickets
+# Lấy danh sách vé của người dùng
 curl -X GET http://localhost:8080/api/tickets/user/1 -H "Authorization: Bearer %TOKEN%"
 
-# Get ticket details
+# Lấy chi tiết vé
 curl -X GET http://localhost:8080/api/tickets/1 -H "Authorization: Bearer %TOKEN%"
 
-# Update ticket status
+# Cập nhật trạng thái vé
 curl -X PUT http://localhost:8080/api/tickets/1/status -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d @test-data/user/update-ticket-status.json
 ```
 
-### 3. Admin Operations (Admin Authentication Required)
+### 3. Thao tác Admin (Yêu cầu xác thực Admin)
 
-#### 3.1 Admin Authentication
+#### 3.1 Xác thực Admin
 ```cmd
-# Register admin user
+# Đăng ký tài khoản admin
 curl -X POST http://localhost:8080/api/auth/register -H "Content-Type: application/json" -d @test-data/admin/register-admin.json
 ```
 
-#### 3.2 Movie Management
+#### 3.2 Quản lý Phim
 ```cmd
-# Create new movie
+# Tạo phim mới
 curl -X POST http://localhost:8080/api/movies -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d @test-data/admin/create-movie.json
 
-# Update movie
+# Cập nhật phim
 curl -X PUT http://localhost:8080/api/movies/1 -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d @test-data/admin/update-movie.json
 
-# Delete movie
+# Xóa phim
 curl -X DELETE http://localhost:8080/api/movies/1 -H "Authorization: Bearer %TOKEN%"
 ```
 
-#### 3.3 Screening Management
+#### 3.3 Quản lý Suất chiếu
 ```cmd
-# Create new screening
+# Tạo suất chiếu mới
 curl -X POST http://localhost:8080/api/screenings -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d @test-data/admin/create-screening.json
 
-# Create multiple screenings
+# Tạo nhiều suất chiếu
 curl -X POST http://localhost:8080/api/screenings/batch -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d @test-data/admin/create-multiple-screenings.json
 
-# Delete screening
+# Xóa suất chiếu
 curl -X DELETE http://localhost:8080/api/screenings/1 -H "Authorization: Bearer %TOKEN%"
 ```
 
-## Test Data Files Description
+### 4. Thao tác với Suất chiếu
+```cmd
+# Lấy thông tin suất chiếu theo ID
+curl -X GET http://localhost:8080/api/screenings/1 -H "Authorization: Bearer %TOKEN%"
 
-### Admin Test Data
-- `register-admin.json`: Admin user registration data
-- `create-movie.json`: New movie creation data
-- `update-movie.json`: Movie update data
-- `create-screening.json`: Single screening creation data
-- `create-multiple-screenings.json`: Batch screening creation data
+# Lấy danh sách suất chiếu theo phim
+curl -X GET http://localhost:8080/api/screenings/movie/1 -H "Authorization: Bearer %TOKEN%"
 
-### User Test Data
-- `register.json`: Regular user registration data
-- `login.json`: User login credentials
-- `update-user.json`: User profile update data
-- `book-ticket.json`: Single ticket booking data
-- `book-multiple-tickets.json`: Multiple tickets booking data
-- `update-ticket-status.json`: Ticket status update data
+# Lấy danh sách suất chiếu theo khoảng thời gian
+curl -X GET "http://localhost:8080/api/screenings/date-range?start=2024-03-20T00:00:00&end=2024-03-21T23:59:59" -H "Authorization: Bearer %TOKEN%"
+```
 
-### Public Test Data
-- `search-movies.json`: Movie search criteria
+## Mô tả File Dữ liệu Kiểm thử
 
-## Testing Tips
-1. Always check the response status code and body
-2. For protected endpoints, ensure the token is valid and not expired
-3. Test both successful and error cases
-4. Keep track of created resource IDs for update/delete operations
-5. Clean up test data after testing (delete created resources)
-6. Test batch operations with both valid and invalid data
-7. Verify cascade deletions (e.g., deleting a movie should delete related screenings and tickets)
+### Dữ liệu Kiểm thử Admin
+- `register-admin.json`: Dữ liệu đăng ký tài khoản admin
+- `create-movie.json`: Dữ liệu tạo phim mới
+- `update-movie.json`: Dữ liệu cập nhật phim
+- `create-screening.json`: Dữ liệu tạo một suất chiếu
+- `create-multiple-screenings.json`: Dữ liệu tạo nhiều suất chiếu
 
-## Common HTTP Status Codes
-- 200 OK: Request successful
-- 201 Created: Resource created successfully
-- 400 Bad Request: Invalid input data
-- 401 Unauthorized: Missing or invalid token
-- 403 Forbidden: Insufficient permissions
-- 404 Not Found: Resource not found
-- 409 Conflict: Resource already exists
-- 500 Internal Server Error: Server-side error
+### Dữ liệu Kiểm thử Người dùng
+- `register.json`: Dữ liệu đăng ký người dùng thông thường
+- `login.json`: Thông tin đăng nhập
+- `update-user.json`: Dữ liệu cập nhật thông tin người dùng
+- `book-ticket.json`: Dữ liệu đặt một vé
+- `book-multiple-tickets.json`: Dữ liệu đặt nhiều vé
+- `update-ticket-status.json`: Dữ liệu cập nhật trạng thái vé
+
+### Dữ liệu Kiểm thử Công khai
+- `search-movies.json`: Tiêu chí tìm kiếm phim
+
+## Lời khuyên khi Kiểm thử
+1. Luôn kiểm tra mã trạng thái và nội dung phản hồi
+2. Đối với các endpoint được bảo vệ, đảm bảo token còn hiệu lực và chưa hết hạn
+3. Kiểm thử cả trường hợp thành công và thất bại
+4. Theo dõi ID của tài nguyên đã tạo để thực hiện cập nhật/xóa
+5. Dọn dẹp dữ liệu kiểm thử sau khi hoàn thành (xóa các tài nguyên đã tạo)
+6. Kiểm thử thao tác hàng loạt với cả dữ liệu hợp lệ và không hợp lệ
+7. Xác minh việc xóa theo cascade (ví dụ: xóa phim sẽ xóa các suất chiếu và vé liên quan)
+
+## Mã Trạng thái HTTP Thông dụng
+- 200 OK: Yêu cầu thành công
+- 201 Created: Tạo tài nguyên thành công
+- 400 Bad Request: Dữ liệu đầu vào không hợp lệ
+- 401 Unauthorized: Thiếu hoặc token không hợp lệ
+- 403 Forbidden: Không đủ quyền truy cập
+- 404 Not Found: Không tìm thấy tài nguyên
+- 409 Conflict: Tài nguyên đã tồn tại
+- 500 Internal Server Error: Lỗi phía máy chủ

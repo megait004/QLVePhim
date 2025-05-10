@@ -33,7 +33,7 @@ build/
 .vscode/
 
 ### Environment Variables ###
-.env
+
 
 # Backend
 backend/target/

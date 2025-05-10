@@ -1,8 +1,8 @@
 {
-    "username": "testuser123",
-    "email": "test123@example.com",
+    "username": "huenguyen",
+    "email": "huenguyen@gmail.com",
     "password": "password123",
-    "fullName": "Test User123",
+    "fullName": "Hue Nguyen",
     "phoneNumber": "1234567890",
     "roles": ["ROLE_USER"]
 }
