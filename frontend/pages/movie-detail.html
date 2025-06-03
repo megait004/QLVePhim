@@ -6,22 +6,100 @@
     <title>Chi tiết phim - Cinema</title>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .movie-detail-card {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        .movie-poster {
+            transition: transform 0.3s ease;
+        }
+        .movie-poster:hover {
+            transform: scale(1.02);
+        }
+        .info-badge {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            color: #8B5CF6;
+        }
+        .movie-description {
+            line-height: 1.8;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-blue-600 text-white p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="../index.html" class="text-2xl font-bold">Cinema</a>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 text-white min-h-screen">
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="../index.html" class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-film mr-2"></i>
+                    <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">Cinema</span>
+                </a>
+                <div class="flex items-center space-x-8">
+                    <a href="../movies.html" class="hover:text-purple-400 transition-colors duration-300">
+                        <i class="fas fa-arrow-left mr-2"></i>Quay lại
+                    </a>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <main class="container mx-auto p-4">
-        <div class="bg-white rounded-lg shadow-lg p-6" id="movie-detail">
-            <div class="text-center">
-                <div class="spinner"></div>
-                <p>Đang tải thông tin phim...</p>
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 pt-24">
+        <div class="movie-detail-card rounded-2xl p-8" id="movie-detail">
+            <div class="text-center py-12">
+                <div class="spinner mx-auto"></div>
+                <p class="mt-4 text-gray-400">Đang tải thông tin phim...</p>
             </div>
         </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 mt-16">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Về Chúng Tôi</h3>
+                    <p class="text-gray-400">Hệ thống rạp chiếu phim hiện đại nhất với công nghệ âm thanh và hình ảnh tuyệt hảo.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Liên Hệ</h3>
+                    <p class="text-gray-400">
+                        <i class="fas fa-phone mr-2"></i> 1900 xxxx<br>
+                        <i class="fas fa-envelope mr-2"></i> support@cinema.com
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Theo Dõi</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-300">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Cinema. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 
     <script>
         const API_URL = 'http://localhost:8080';
@@ -35,24 +113,62 @@
                     `${API_URL}/images/movie-posters/default.jpg`;
 
                 document.getElementById('movie-detail').innerHTML = `
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
                         <div class="md:col-span-1">
-                            <img src="${imageUrl}"
-                                 alt="${movie.title}"
-                                 class="w-full rounded-lg shadow-md"
-                                 onerror="this.onerror=null; this.src='${API_URL}/images/movie-posters/default.jpg'">
+                            <div class="relative group">
+                                <img src="${imageUrl}"
+                                     alt="${movie.title}"
+                                     class="w-full rounded-xl shadow-xl movie-poster object-cover"
+                                     onerror="this.onerror=null; this.src='${API_URL}/images/movie-posters/default.jpg'">
+                                <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-50 rounded-xl"></div>
+                            </div>
+                            <div class="mt-6 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="bg-purple-500 text-white text-sm px-4 py-1.5 rounded-full">
+                                        ${movie.genre || 'Chưa cập nhật'}
+                                    </span>
+                                    <span class="text-gray-400">
+                                        <i class="far fa-clock mr-1"></i>${movie.duration || 0} phút
+                                    </span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-star text-yellow-500 mr-1"></i>
+                                        <span class="text-gray-400">8.5</span>
+                                    </div>
+                                    <span class="text-purple-400">
+                                        ${movie.status === 'NOW_SHOWING' ? 'Đang chiếu' : 'Sắp chiếu'}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                         <div class="md:col-span-2">
-                            <h1 class="text-3xl font-bold mb-4">${movie.title}</h1>
-                            <div class="space-y-4">
-                                <p><span class="font-semibold">Thể loại:</span> ${movie.genre || 'Chưa cập nhật'}</p>
-                                <p><span class="font-semibold">Thời lượng:</span> ${movie.duration || 0} phút</p>
-                                <p><span class="font-semibold">Đạo diễn:</span> ${movie.director || 'Chưa cập nhật'}</p>
-                                <p><span class="font-semibold">Diễn viên:</span> ${movie.movieCast || 'Chưa cập nhật'}</p>
-                                <p><span class="font-semibold">Ngày khởi chiếu:</span> ${movie.releaseDate || 'Chưa cập nhật'}</p>
-                                <div class="mt-4">
-                                    <h3 class="text-xl font-semibold mb-2">Nội dung phim</h3>
-                                    <p class="text-gray-700">${movie.description || 'Chưa có mô tả.'}</p>
+                            <h1 class="text-4xl font-bold mb-6 bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">
+                                ${movie.title}
+                            </h1>
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="info-badge rounded-lg p-4">
+                                        <p class="text-sm opacity-80 mb-1">Đạo diễn</p>
+                                        <p class="font-medium">${movie.director || 'Chưa cập nhật'}</p>
+                                    </div>
+                                    <div class="info-badge rounded-lg p-4">
+                                        <p class="text-sm opacity-80 mb-1">Ngày khởi chiếu</p>
+                                        <p class="font-medium">${formatDate(movie.releaseDate) || 'Chưa cập nhật'}</p>
+                                    </div>
+                                </div>
+                                <div class="info-badge rounded-lg p-4">
+                                    <p class="text-sm opacity-80 mb-1">Diễn viên</p>
+                                    <p class="font-medium">${movie.cast || 'Chưa cập nhật'}</p>
+                                </div>
+                                <div class="mt-8">
+                                    <h3 class="text-2xl font-semibold mb-4">Nội dung phim</h3>
+                                    <p class="text-gray-300 movie-description">${movie.description || 'Chưa có mô tả.'}</p>
+                                </div>
+                                <div class="mt-8">
+                                    <a href="../screenings.html" class="inline-block bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-full transition-colors duration-300">
+                                        <i class="fas fa-ticket-alt mr-2"></i>Đặt vé ngay
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -60,16 +176,27 @@
                 `;
             })
             .catch(error => {
-                console.error('Error:', error);
                 document.getElementById('movie-detail').innerHTML = `
-                    <div class="text-center text-red-500">
-                        <p>Có lỗi xảy ra khi tải thông tin phim.</p>
-                        <button onclick="window.location.reload()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
-                            Thử lại
+                    <div class="text-center py-12">
+                        <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+                        <p class="text-red-400 mb-4">Có lỗi xảy ra khi tải thông tin phim.</p>
+                        <button onclick="window.location.reload()"
+                                class="bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-full transition-colors duration-300">
+                            <i class="fas fa-sync-alt mr-2"></i>Thử lại
                         </button>
                     </div>
                 `;
             });
+
+        function formatDate(dateString) {
+            if (!dateString) return null;
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
     </script>
 </body>
 </html>

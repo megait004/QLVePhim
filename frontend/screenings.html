@@ -7,34 +7,87 @@
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .date-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .date-input:focus {
+            border-color: #8B5CF6;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+        }
+        .screening-card {
+            transition: all 0.3s ease;
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        .screening-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+        .time-slot {
+            transition: all 0.2s ease;
+        }
+        .time-slot:hover {
+            transform: scale(1.05);
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 text-white min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-blue-600 text-white p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="index.html" class="text-2xl font-bold">Cinema</a>
-            <div class="space-x-4">
-                <a href="movies.html" class="hover:text-blue-200">Phim</a>
-                <a href="screenings.html" class="hover:text-blue-200">Lịch Chiếu</a>
-                <div x-data="{ open: false }" class="relative inline-block">
-                    <button @click="open = !open" class="hover:text-blue-200">
-                        Tài Khoản
-                    </button>
-                    <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
-                        <template x-if="!isLoggedIn()">
-                            <div>
-                                <a href="pages/login.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">Đăng Nhập</a>
-                                <a href="pages/register.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">Đăng Ký</a>
-                            </div>
-                        </template>
-                        <template x-if="isLoggedIn()">
-                            <div>
-                                <a href="pages/profile.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">Hồ Sơ</a>
-                                <a href="pages/tickets.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">Vé Của Tôi</a>
-                                <button @click="logout()" class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">Đăng Xuất</button>
-                            </div>
-                        </template>
+    <nav class="glass-nav fixed w-full z-50 transition-all duration-300" x-data="{ isScrolled: false }" @scroll.window="isScrolled = (window.pageYOffset > 20)">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-film mr-2"></i>
+                    <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">Cinema</span>
+                </a>
+                <div class="flex items-center space-x-8">
+                    <a href="movies.html" class="hover:text-purple-400 transition-colors duration-300">Phim</a>
+                    <a href="screenings.html" class="hover:text-purple-400 transition-colors duration-300">Lịch Chiếu</a>
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open" class="flex items-center hover:text-purple-400 transition-colors duration-300">
+                            <i class="fas fa-user-circle mr-2"></i>
+                            <span>Tài Khoản</span>
+                        </button>
+                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2">
+                            <template x-if="!isLoggedIn()">
+                                <div>
+                                    <a href="pages/login.html" class="block px-4 py-2 text-gray-800 hover:bg-purple-500 hover:text-white transition-colors duration-300">
+                                        <i class="fas fa-sign-in-alt mr-2"></i> Đăng Nhập
+                                    </a>
+                                    <a href="pages/register.html" class="block px-4 py-2 text-gray-800 hover:bg-purple-500 hover:text-white transition-colors duration-300">
+                                        <i class="fas fa-user-plus mr-2"></i> Đăng Ký
+                                    </a>
+                                </div>
+                            </template>
+                            <template x-if="isLoggedIn()">
+                                <div>
+                                    <a href="pages/profile.html" class="block px-4 py-2 text-gray-800 hover:bg-purple-500 hover:text-white transition-colors duration-300">
+                                        <i class="fas fa-user mr-2"></i> Hồ Sơ
+                                    </a>
+                                    <a href="pages/tickets.html" class="block px-4 py-2 text-gray-800 hover:bg-purple-500 hover:text-white transition-colors duration-300">
+                                        <i class="fas fa-ticket-alt mr-2"></i> Vé Của Tôi
+                                    </a>
+                                    <button @click="logout()" class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-purple-500 hover:text-white transition-colors duration-300">
+                                        <i class="fas fa-sign-out-alt mr-2"></i> Đăng Xuất
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -42,34 +95,77 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="container mx-auto p-4">
+    <main class="container mx-auto px-6 pt-24">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4">
+                <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">
+                    Lịch Chiếu Phim
+                </span>
+            </h1>
+            <p class="text-gray-400">Chọn ngày và giờ phù hợp với bạn</p>
+        </div>
+
         <!-- Date Filter -->
-        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="screening-card rounded-2xl p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                    <label class="block text-gray-700 mb-2">Từ ngày</label>
-                    <input type="date" id="start-date" class="w-full p-2 border rounded">
+                    <label class="block text-gray-300 mb-2 font-medium">
+                        <i class="far fa-calendar-alt mr-2"></i>Từ ngày
+                    </label>
+                    <input type="date" id="start-date" class="w-full p-3 rounded-lg date-input bg-gray-800">
                 </div>
                 <div>
-                    <label class="block text-gray-700 mb-2">Đến ngày</label>
-                    <input type="date" id="end-date" class="w-full p-2 border rounded">
+                    <label class="block text-gray-300 mb-2 font-medium">
+                        <i class="far fa-calendar-alt mr-2"></i>Đến ngày
+                    </label>
+                    <input type="date" id="end-date" class="w-full p-3 rounded-lg date-input bg-gray-800">
                 </div>
             </div>
         </div>
 
         <!-- Screenings List -->
-        <div id="screenings-list" class="space-y-6">
+        <div id="screenings-list" class="space-y-8">
             <div class="text-center">
                 <div class="spinner mx-auto"></div>
-                <p class="mt-2">Đang tải lịch chiếu...</p>
+                <p class="mt-4 text-gray-400">Đang tải lịch chiếu...</p>
             </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white p-4 mt-8">
-        <div class="container mx-auto text-center">
-            <p>&copy; 2024 Cinema. All rights reserved.</p>
+    <footer class="bg-gray-900 text-white py-12 mt-16">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Về Chúng Tôi</h3>
+                    <p class="text-gray-400">Hệ thống rạp chiếu phim hiện đại nhất với công nghệ âm thanh và hình ảnh tuyệt hảo.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Liên Hệ</h3>
+                    <p class="text-gray-400">
+                        <i class="fas fa-phone mr-2"></i> 1900 xxxx<br>
+                        <i class="fas fa-envelope mr-2"></i> support@cinema.com
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Theo Dõi</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-300">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Cinema. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
@@ -105,13 +201,10 @@
         }
 
         function setDefaultDates() {
-            // Lấy ngày hiện tại
             const today = new Date();
-            // Tạo ngày kết thúc (7 ngày sau)
             const nextWeek = new Date();
             nextWeek.setDate(today.getDate() + 7);
 
-            // Format ngày theo YYYY-MM-DD
             function formatDateForInput(date) {
                 const year = date.getFullYear();
                 const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -122,9 +215,8 @@
             document.getElementById('start-date').value = formatDateForInput(today);
             document.getElementById('end-date').value = formatDateForInput(nextWeek);
 
-            // Set min và max date cho input
             const maxDate = new Date();
-            maxDate.setDate(today.getDate() + 30); // Cho phép đặt vé trước 30 ngày
+            maxDate.setDate(today.getDate() + 30);
 
             document.getElementById('start-date').min = formatDateForInput(today);
             document.getElementById('start-date').max = formatDateForInput(maxDate);
@@ -137,15 +229,15 @@
             const endDate = document.getElementById('end-date').value;
             const screeningsList = document.getElementById('screenings-list');
 
-            // Kiểm tra ngày hợp lệ
             const start = new Date(startDate);
             const end = new Date(endDate);
             const today = new Date();
 
             if (start > end) {
                 screeningsList.innerHTML = `
-                    <div class="text-center text-red-500 p-4">
-                        <p>Ngày bắt đầu không thể sau ngày kết thúc.</p>
+                    <div class="screening-card rounded-xl p-8 text-center">
+                        <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+                        <p class="text-red-400">Ngày bắt đầu không thể sau ngày kết thúc.</p>
                     </div>
                 `;
                 return;
@@ -153,8 +245,9 @@
 
             if (end < today) {
                 screeningsList.innerHTML = `
-                    <div class="text-center text-red-500 p-4">
-                        <p>Không thể xem lịch chiếu của ngày đã qua.</p>
+                    <div class="screening-card rounded-xl p-8 text-center">
+                        <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+                        <p class="text-red-400">Không thể xem lịch chiếu của ngày đã qua.</p>
                     </div>
                 `;
                 return;
@@ -163,30 +256,28 @@
             const dayDiff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
             if (dayDiff > 30) {
                 screeningsList.innerHTML = `
-                    <div class="text-center text-red-500 p-4">
-                        <p>Khoảng thời gian tìm kiếm không được vượt quá 30 ngày.</p>
+                    <div class="screening-card rounded-xl p-8 text-center">
+                        <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+                        <p class="text-red-400">Khoảng thời gian tìm kiếm không được vượt quá 30 ngày.</p>
                     </div>
                 `;
                 return;
             }
 
-            console.log('Loading screenings for date range:', startDate, 'to', endDate);
-
-            // Show loading state
             screeningsList.innerHTML = `
-                <div class="text-center">
+                <div class="text-center p-8">
                     <div class="spinner mx-auto"></div>
-                    <p class="mt-2">Đang tải lịch chiếu...</p>
+                    <p class="mt-4 text-gray-400">Đang tải lịch chiếu...</p>
                 </div>
             `;
 
-            // Check if user is logged in
             if (!isLoggedIn()) {
                 screeningsList.innerHTML = `
-                    <div class="text-center text-gray-500 p-4">
-                        <p>Vui lòng đăng nhập để xem lịch chiếu.</p>
-                        <a href="pages/login.html" class="mt-4 inline-block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
-                            Đăng nhập
+                    <div class="screening-card rounded-xl p-8 text-center">
+                        <i class="fas fa-user-lock text-purple-500 text-4xl mb-4"></i>
+                        <p class="text-gray-300 mb-4">Vui lòng đăng nhập để xem lịch chiếu.</p>
+                        <a href="pages/login.html" class="inline-block bg-purple-500 text-white px-8 py-3 rounded-full hover:bg-purple-600 transition-colors duration-300">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Đăng nhập
                         </a>
                     </div>
                 `;
@@ -194,17 +285,14 @@
             }
 
             const token = localStorage.getItem('token');
-            console.log('Using token:', token);
 
             fetch(`${API_URL}/api/screenings/date-range?start=${startDate}T00:00:00&end=${endDate}T23:59:59`, {
-                method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             })
             .then(response => {
-                console.log('Response status:', response.status);
                 if (!response.ok) {
                     if (response.status === 403) {
                         throw new Error('Không có quyền truy cập');
@@ -214,24 +302,21 @@
                 return response.json();
             })
             .then(screenings => {
-                console.log('Received screenings:', screenings);
-
                 if (!Array.isArray(screenings) || screenings.length === 0) {
                     screeningsList.innerHTML = `
-                        <div class="text-center text-gray-500 p-4">
-                            <p>Không có suất chiếu nào trong khoảng thời gian này.</p>
-                            <p class="mt-2 text-sm">Thời gian tìm kiếm: ${startDate} đến ${endDate}</p>
+                        <div class="screening-card rounded-xl p-8 text-center">
+                            <i class="fas fa-calendar-times text-gray-500 text-4xl mb-4"></i>
+                            <p class="text-gray-300 mb-2">Không có suất chiếu nào trong khoảng thời gian này.</p>
+                            <p class="text-gray-400 text-sm">Thời gian tìm kiếm: ${startDate} đến ${endDate}</p>
                         </div>
                     `;
                     return;
                 }
 
-                // Group screenings by movie and fetch movie details
                 const screeningsByMovie = {};
                 const movieDetailsPromises = [];
 
                 screenings.forEach(screening => {
-                    console.log('Processing screening:', screening);
                     if (screening && screening.movieId && screening.movieTitle) {
                         const movieId = screening.movieId;
                         if (!screeningsByMovie[movieId]) {
@@ -243,115 +328,78 @@
                                 screenings: []
                             };
 
-                            // Fetch movie details
-                            const moviePromise = fetch(`${API_URL}/api/movies/public/${movieId}`)
-                                .then(response => response.json())
-                                .then(movieDetails => {
-                                    screeningsByMovie[movieId].movie = {
-                                        ...screeningsByMovie[movieId].movie,
-                                        ...movieDetails
-                                    };
-                                })
-                                .catch(error => {
-                                    console.error(`Error fetching details for movie ${movieId}:`, error);
-                                });
-
-                            movieDetailsPromises.push(moviePromise);
+                            movieDetailsPromises.push(
+                                fetch(`${API_URL}/api/movies/public/${movieId}`)
+                                    .then(response => response.json())
+                                    .then(movieDetails => {
+                                        screeningsByMovie[movieId].movie = {
+                                            ...screeningsByMovie[movieId].movie,
+                                            ...movieDetails
+                                        };
+                                    })
+                            );
                         }
-                        screeningsByMovie[movieId].screenings.push({
-                            id: screening.id,
-                            startTime: screening.startTime,
-                            hallNumber: screening.hallNumber,
-                            price: screening.price,
-                            availableSeats: screening.availableSeats
-                        });
-                    } else {
-                        console.warn('Invalid screening data:', screening);
+                        screeningsByMovie[movieId].screenings.push(screening);
                     }
                 });
 
-                // Wait for all movie details to be fetched
                 Promise.all(movieDetailsPromises)
                     .then(() => {
-                        console.log('Grouped screenings with details:', screeningsByMovie);
-
-                        if (Object.keys(screeningsByMovie).length === 0) {
-                            screeningsList.innerHTML = `
-                                <div class="text-center text-gray-500 p-4">
-                                    <p>Không tìm thấy thông tin phim cho các suất chiếu.</p>
-                                    <p class="mt-2 text-sm">Vui lòng kiểm tra lại dữ liệu hoặc thử lại sau.</p>
-                                </div>
-                            `;
-                            return;
-                        }
-
-                        // Generate HTML for each movie and its screenings
-                        screeningsList.innerHTML = Object.values(screeningsByMovie).map(group => `
-                            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <div class="md:col-span-1">
-                                        <img src="${getMoviePosterUrl(group.movie.posterUrl)}"
-                                             alt="${group.movie.title}"
+                        screeningsList.innerHTML = Object.values(screeningsByMovie)
+                            .map(({ movie, screenings }) => `
+                                <div class="screening-card rounded-xl overflow-hidden">
+                                    <div class="relative">
+                                        <img src="${movie.posterUrl ? `${API_URL}/${movie.posterUrl.replace(/^\//, '')}` : `${API_URL}/images/movie-posters/default.jpg`}"
                                              class="w-full h-64 object-cover"
-                                             onerror="this.onerror=null; this.src='${API_URL}/images/movie-posters/default.jpg'">
+                                             alt="${movie.title}">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
+                                        <div class="absolute bottom-0 left-0 right-0 p-6">
+                                            <h3 class="text-2xl font-bold mb-2">${movie.title}</h3>
+                                            <p class="text-gray-300">
+                                                <span class="bg-purple-500 text-white text-sm px-3 py-1 rounded-full">${movie.genre || 'Chưa cập nhật'}</span>
+                                                <span class="ml-3"><i class="far fa-clock mr-1"></i>${movie.duration || 0} phút</span>
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div class="md:col-span-3 p-4">
-                                        <h2 class="text-2xl font-bold mb-4">${group.movie.title}</h2>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                            ${group.screenings.map(screening => `
-                                                <div class="bg-gray-50 p-4 rounded-lg">
-                                                    <p class="font-semibold">${formatDateTime(screening.startTime)}</p>
-                                                    <p class="text-gray-600">Phòng: ${screening.hallNumber || 'Chưa cập nhật'}</p>
-                                                    <p class="text-gray-600">Giá: ${formatPrice(screening.price || 0)} VND</p>
-                                                    <p class="text-gray-600">Ghế trống: ${screening.availableSeats || 0}</p>
-                                                    <button onclick="bookTicket(${screening.id})"
-                                                            class="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                                                        Đặt vé
-                                                    </button>
-                                                </div>
-                                            `).join('')}
+                                    <div class="p-6 bg-gray-800">
+                                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                            ${screenings
+                                                .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+                                                .map(screening => `
+                                                    <a href="pages/booking.html?screeningId=${screening.id}"
+                                                       class="time-slot block text-center p-3 bg-gray-700 rounded-lg hover:bg-purple-500 transition-all duration-300">
+                                                        <div class="text-sm text-gray-300 mb-1">${new Date(screening.startTime).toLocaleDateString('vi-VN', { weekday: 'short', month: 'numeric', day: 'numeric' })}</div>
+                                                        <div class="font-semibold">${new Date(screening.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</div>
+                                                        <div class="text-sm text-gray-300 mt-1">${formatPrice(screening.price)}</div>
+                                                    </a>
+                                                `).join('')}
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        `).join('');
+                            `).join('');
                     });
             })
             .catch(error => {
-                console.error('Error loading screenings:', error);
                 screeningsList.innerHTML = `
-                    <div class="text-center text-red-500 p-4">
-                        <p>${error.message || 'Có lỗi xảy ra khi tải lịch chiếu.'}</p>
-                        <button onclick="loadScreenings()" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
-                            Thử lại
+                    <div class="screening-card rounded-xl p-8 text-center">
+                        <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+                        <p class="text-red-400 mb-4">Có lỗi xảy ra khi tải dữ liệu.</p>
+                        <button onclick="window.location.reload()"
+                                class="bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-full transition-colors duration-300">
+                            <i class="fas fa-sync-alt mr-2"></i>Thử lại
                         </button>
                     </div>
                 `;
             });
         }
 
-        function getMoviePosterUrl(posterUrl) {
-            if (!posterUrl) {
-                return `${API_URL}/images/movie-posters/default.jpg`;
-            }
-            return `${API_URL}/${posterUrl.replace(/^\//, '')}`;
-        }
-
-        function bookTicket(screeningId) {
-            if (!isLoggedIn()) {
-                window.location.href = 'pages/login.html';
-                return;
-            }
-            window.location.href = `pages/booking.html?screeningId=${screeningId}`;
-        }
-
-        // Add event listeners for date filters
-        document.getElementById('start-date').addEventListener('change', loadScreenings);
-        document.getElementById('end-date').addEventListener('change', loadScreenings);
-
-        // Initialize page
+        // Set default dates and load screenings when page loads
         setDefaultDates();
         loadScreenings();
+
+        // Add event listeners for date inputs
+        document.getElementById('start-date').addEventListener('change', loadScreenings);
+        document.getElementById('end-date').addEventListener('change', loadScreenings);
     </script>
 </body>
 </html>

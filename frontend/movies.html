@@ -6,34 +6,93 @@
     <title>Danh Sách Phim - Cinema</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .movie-card {
+            transition: all 0.3s ease;
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+        .filter-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .filter-input:focus {
+            border-color: #8B5CF6;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+        }
+        .filter-input option {
+            background-color: #1F2937;
+            color: white;
+        }
+        .movie-overlay {
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .movie-card:hover .movie-overlay {
+            opacity: 1;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 text-white min-h-screen">
     <!-- Navigation -->
-    <nav class="bg-blue-600 text-white p-4">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="index.html" class="text-2xl font-bold">Cinema</a>
-            <div class="space-x-4">
-                <a href="movies.html" class="hover:text-blue-200">Phim</a>
-                <a href="screenings.html" class="hover:text-blue-200">Lịch Chiếu</a>
-                <div x-data="{ open: false }" class="relative inline-block">
-                    <button @click="open = !open" class="hover:text-blue-200">
-                        Tài Khoản
-                    </button>
-                    <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
-                        <template x-if="!isLoggedIn()">
-                            <div>
-                                <a href="pages/login.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">Đăng Nhập</a>
-                                <a href="pages/register.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">Đăng Ký</a>
-                            </div>
-                        </template>
-                        <template x-if="isLoggedIn()">
-                            <div>
-                                <a href="pages/profile.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">Hồ Sơ</a>
-                                <a href="pages/tickets.html" class="block px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">Vé Của Tôi</a>
-                                <button @click="logout()" class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-blue-500 hover:text-white">Đăng Xuất</button>
-                            </div>
-                        </template>
+    <nav class="glass-nav fixed w-full z-50 transition-all duration-300" x-data="{ isScrolled: false }" @scroll.window="isScrolled = (window.pageYOffset > 20)">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-film mr-2"></i>
+                    <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">Cinema</span>
+                </a>
+                <div class="flex items-center space-x-8">
+                    <a href="movies.html" class="hover:text-purple-400 transition-colors duration-300">Phim</a>
+                    <a href="screenings.html" class="hover:text-purple-400 transition-colors duration-300">Lịch Chiếu</a>
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open" class="flex items-center hover:text-purple-400 transition-colors duration-300">
+                            <i class="fas fa-user-circle mr-2"></i>
+                            <span>Tài Khoản</span>
+                        </button>
+                        <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2">
+                            <template x-if="!isLoggedIn()">
+                                <div>
+                                    <a href="pages/login.html" class="block px-4 py-2 text-gray-800 hover:bg-purple-500 hover:text-white transition-colors duration-300">
+                                        <i class="fas fa-sign-in-alt mr-2"></i> Đăng Nhập
+                                    </a>
+                                    <a href="pages/register.html" class="block px-4 py-2 text-gray-800 hover:bg-purple-500 hover:text-white transition-colors duration-300">
+                                        <i class="fas fa-user-plus mr-2"></i> Đăng Ký
+                                    </a>
+                                </div>
+                            </template>
+                            <template x-if="isLoggedIn()">
+                                <div>
+                                    <a href="pages/profile.html" class="block px-4 py-2 text-gray-800 hover:bg-purple-500 hover:text-white transition-colors duration-300">
+                                        <i class="fas fa-user mr-2"></i> Hồ Sơ
+                                    </a>
+                                    <a href="pages/tickets.html" class="block px-4 py-2 text-gray-800 hover:bg-purple-500 hover:text-white transition-colors duration-300">
+                                        <i class="fas fa-ticket-alt mr-2"></i> Vé Của Tôi
+                                    </a>
+                                    <button @click="logout()" class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-purple-500 hover:text-white transition-colors duration-300">
+                                        <i class="fas fa-sign-out-alt mr-2"></i> Đăng Xuất
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -41,47 +100,95 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="container mx-auto p-4">
+    <main class="container mx-auto px-6 pt-24">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4">
+                <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">
+                    Danh Sách Phim
+                </span>
+            </h1>
+            <p class="text-gray-400">Khám phá những bộ phim đang chiếu và sắp chiếu</p>
+        </div>
+
         <!-- Filter Section -->
-        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="movie-card rounded-2xl p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
-                    <label class="block text-gray-700 mb-2">Thể loại</label>
-                    <select id="genre-filter" class="w-full p-2 border rounded">
+                    <label class="block text-gray-300 mb-2 font-medium">
+                        <i class="fas fa-film mr-2"></i>Thể loại
+                    </label>
+                    <select id="genre-filter" class="w-full p-3 rounded-lg filter-input bg-gray-800"
+                            hx-get="http://localhost:8080/api/movies/public/genres"
+                            hx-trigger="load"
+                            hx-target="this"
+                            hx-swap="innerHTML">
                         <option value="">Tất cả</option>
-                        <!-- Genres will be loaded dynamically -->
                     </select>
                 </div>
                 <div>
-                    <label class="block text-gray-700 mb-2">Trạng thái</label>
-                    <select id="status-filter" class="w-full p-2 border rounded">
+                    <label class="block text-gray-300 mb-2 font-medium">
+                        <i class="fas fa-clock mr-2"></i>Trạng thái
+                    </label>
+                    <select id="status-filter" class="w-full p-3 rounded-lg filter-input bg-gray-800">
                         <option value="">Tất cả</option>
                         <option value="now-showing">Đang chiếu</option>
                         <option value="coming-soon">Sắp chiếu</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-gray-700 mb-2">Tìm kiếm</label>
+                    <label class="block text-gray-300 mb-2 font-medium">
+                        <i class="fas fa-search mr-2"></i>Tìm kiếm
+                    </label>
                     <input type="text" id="search-input"
-                           class="w-full p-2 border rounded"
+                           class="w-full p-3 rounded-lg filter-input bg-gray-800"
                            placeholder="Nhập tên phim...">
                 </div>
             </div>
         </div>
 
         <!-- Movies Grid -->
-        <div id="movies-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div id="movies-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
             <div class="col-span-full text-center">
                 <div class="spinner mx-auto"></div>
-                <p class="mt-2">Đang tải danh sách phim...</p>
+                <p class="mt-4 text-gray-400">Đang tải danh sách phim...</p>
             </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white p-4 mt-8">
-        <div class="container mx-auto text-center">
-            <p>&copy; 2024 Cinema. All rights reserved.</p>
+    <footer class="bg-gray-900 text-white py-12 mt-16">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Về Chúng Tôi</h3>
+                    <p class="text-gray-400">Hệ thống rạp chiếu phim hiện đại nhất với công nghệ âm thanh và hình ảnh tuyệt hảo.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Liên Hệ</h3>
+                    <p class="text-gray-400">
+                        <i class="fas fa-phone mr-2"></i> 1900 xxxx<br>
+                        <i class="fas fa-envelope mr-2"></i> support@cinema.com
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Theo Dõi</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-300">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Cinema. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
@@ -102,7 +209,7 @@
             moviesGrid.innerHTML = `
                 <div class="col-span-full text-center">
                     <div class="spinner mx-auto"></div>
-                    <p class="mt-2">Đang tải danh sách phim...</p>
+                    <p class="mt-4 text-gray-400">Đang tải danh sách phim...</p>
                 </div>
             `;
 
@@ -117,12 +224,10 @@
                     updateMoviesGrid(movies);
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     showError();
                 });
         }
 
-        // Filter functionality
         const genreFilter = document.getElementById('genre-filter');
         const statusFilter = document.getElementById('status-filter');
         const searchInput = document.getElementById('search-input');
@@ -132,16 +237,14 @@
             const status = statusFilter.value;
             const search = searchInput.value.trim();
 
-            // Show loading state
             const moviesGrid = document.getElementById('movies-grid');
             moviesGrid.innerHTML = `
                 <div class="col-span-full text-center">
                     <div class="spinner mx-auto"></div>
-                    <p class="mt-2">Đang tải danh sách phim...</p>
+                    <p class="mt-4 text-gray-400">Đang tải danh sách phim...</p>
                 </div>
             `;
 
-            // Handle search first
             if (search) {
                 const searchData = {
                     title: search,
@@ -163,7 +266,6 @@
                     return response.json();
                 })
                 .then(data => {
-                    // Filter results if needed
                     let filteredMovies = data;
                     if (search) {
                         filteredMovies = data.filter(movie =>
@@ -173,23 +275,18 @@
                     updateMoviesGrid(filteredMovies);
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     showError();
                 });
                 return;
             }
 
-            // Build the URL based on filters
             let url = `${API_URL}/api/movies/public/`;
 
             if (genre) {
-                // If genre is selected, use the genre endpoint
                 url += `genre/${genre}`;
             } else if (status === 'now-showing') {
-                // If no genre but status is now-showing
                 url += 'now-showing';
             } else {
-                // Default to all movies
                 url += 'all';
             }
 
@@ -204,7 +301,6 @@
                     updateMoviesGrid(movies);
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     showError();
                 });
         }
@@ -222,20 +318,31 @@
                     }
 
                     return `
-                    <div class="movie-card bg-white rounded-lg shadow-lg overflow-hidden">
-                        <img src="${imageUrl}"
-                             alt="${movie.title}"
-                             class="w-full h-64 object-cover"
-                             onerror="this.onerror=null; this.src='${API_URL}/images/movie-posters/default.jpg'">
-                        <div class="p-4">
-                            <h3 class="text-xl font-semibold mb-2">${movie.title}</h3>
-                            <p class="text-gray-600 mb-2">${movie.genre || 'Chưa cập nhật'}</p>
-                            <p class="text-sm text-gray-500 mb-4">${movie.duration || 0} phút</p>
-                            <div class="flex justify-between items-center">
-                                <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                                        onclick="window.location.href='pages/movie-detail.html?id=${movie.id}'">
-                                    Chi tiết
+                    <div class="movie-card rounded-xl overflow-hidden">
+                        <div class="relative group">
+                            <img src="${imageUrl}"
+                                 alt="${movie.title}"
+                                 class="w-full h-96 object-cover transform group-hover:scale-105 transition-transform duration-300"
+                                 onerror="this.onerror=null; this.src='${API_URL}/images/movie-posters/default.jpg'">
+                            <div class="absolute inset-0 bg-black bg-opacity-50 movie-overlay flex items-center justify-center">
+                                <button onclick="window.location.href='pages/movie-detail.html?id=${movie.id}'"
+                                        class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-full transform -translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                                    <i class="fas fa-info-circle mr-2"></i>Chi tiết
                                 </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold mb-2 text-white">${movie.title}</h3>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="bg-purple-500 text-white text-sm px-3 py-1 rounded-full">${movie.genre || 'Chưa cập nhật'}</span>
+                                <span class="text-gray-400"><i class="far fa-clock mr-1"></i>${movie.duration || 0} phút</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-yellow-500 mr-1"></i>
+                                    <span class="text-gray-400">8.5</span>
+                                </div>
+                                <span class="text-purple-400">${movie.status === 'NOW_SHOWING' ? 'Đang chiếu' : 'Sắp chiếu'}</span>
                             </div>
                         </div>
                     </div>
@@ -243,8 +350,9 @@
                 }).join('');
             } else {
                 moviesGrid.innerHTML = `
-                    <div class="col-span-full text-center text-gray-500 p-4">
-                        Không có phim nào phù hợp với tiêu chí tìm kiếm.
+                    <div class="col-span-full text-center p-8">
+                        <i class="fas fa-film text-gray-500 text-4xl mb-4"></i>
+                        <p class="text-gray-400">Không có phim nào phù hợp với tiêu chí tìm kiếm.</p>
                     </div>
                 `;
             }
@@ -253,21 +361,28 @@
         function showError() {
             const moviesGrid = document.getElementById('movies-grid');
             moviesGrid.innerHTML = `
-                <div class="col-span-full text-center text-red-500 p-4">
-                    <p>Có lỗi xảy ra khi tải dữ liệu.</p>
-                    <button onclick="loadMovies()" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
-                        Thử lại
+                <div class="col-span-full text-center p-8">
+                    <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+                    <p class="text-red-400 mb-4">Có lỗi xảy ra khi tải dữ liệu.</p>
+                    <button onclick="window.location.reload()"
+                            class="bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-full transition-colors duration-300">
+                        <i class="fas fa-sync-alt mr-2"></i>Thử lại
                     </button>
                 </div>
             `;
         }
+
+        // Load movies when page loads
+        loadMovies();
+
+        // Load genres when page loads
+        loadGenres();
 
         // Add event listeners for filters
         genreFilter.addEventListener('change', applyFilters);
         statusFilter.addEventListener('change', applyFilters);
         searchInput.addEventListener('input', debounce(applyFilters, 500));
 
-        // Debounce function to limit API calls while typing
         function debounce(func, wait) {
             let timeout;
             return function executedFunction(...args) {
@@ -280,36 +395,27 @@
             };
         }
 
-        // Load genres when page loads
+        // Thêm hàm để load thể loại
         function loadGenres() {
-            fetch(`${API_URL}/api/movies/public/all`)
+            fetch(`${API_URL}/api/movies/public/genres`)
                 .then(response => response.json())
-                .then(movies => {
-                    // Get unique genres from all movies
-                    const genres = [...new Set(movies.map(movie => movie.genre).filter(Boolean))];
+                .then(genres => {
+                    const genreSelect = document.getElementById('genre-filter');
+                    genreSelect.innerHTML = '<option value="">Tất cả</option>';
 
-                    // Sort genres alphabetically
-                    genres.sort();
-
-                    // Get the genre filter select element
-                    const genreFilter = document.getElementById('genre-filter');
-
-                    // Add genre options
                     genres.forEach(genre => {
-                        const option = document.createElement('option');
-                        option.value = genre;
-                        option.textContent = genre;
-                        genreFilter.appendChild(option);
+                        if (genre) {
+                            const option = document.createElement('option');
+                            option.value = genre;
+                            option.textContent = genre;
+                            genreSelect.appendChild(option);
+                        }
                     });
                 })
                 .catch(error => {
                     console.error('Error loading genres:', error);
                 });
         }
-
-        // Initialize page
-        loadMovies();
-        loadGenres();
     </script>
 </body>
 </html>

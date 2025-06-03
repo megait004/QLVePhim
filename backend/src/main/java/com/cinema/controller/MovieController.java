@@ -150,4 +150,10 @@ public class MovieController {
             .collect(Collectors.toList());
         return ResponseEntity.ok(statuses);
     }
+
+    @GetMapping("/public/genres")
+    public ResponseEntity<List<String>> getAllGenres() {
+        List<String> genres = movieService.getAllUniqueGenres();
+        return ResponseEntity.ok(genres);
+    }
 }

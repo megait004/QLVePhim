@@ -5,155 +5,261 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng Ký - Cinema</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .glass-card {
+            background: rgba(17, 25, 40, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.125);
+            transition: transform 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+        }
+        .form-input {
+            @apply w-full px-4 py-3.5 rounded-xl bg-gray-800/30 border-2 border-gray-700/50 text-white
+            placeholder-gray-400 focus:outline-none focus:border-purple-500/50 focus:bg-gray-800/50
+            transition-all duration-300;
+            backdrop-filter: blur(4px);
+        }
+        .form-input:hover {
+            @apply border-gray-600/70 bg-gray-800/40;
+        }
+        .form-input:focus {
+            @apply ring-4 ring-purple-500/20;
+        }
+        .input-group {
+            @apply relative flex items-center;
+        }
+        .input-icon {
+            @apply absolute left-4 text-gray-400 pointer-events-none transition-transform duration-300 text-lg;
+        }
+        .form-input:focus + .input-icon {
+            @apply text-purple-400 scale-110;
+        }
+        .btn-primary {
+            @apply w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-3.5 px-6 rounded-xl
+            hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2
+            focus:ring-offset-gray-900 transform transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-purple-500/20;
+        }
+        .social-btn {
+            @apply flex items-center justify-center w-full py-3 px-4 rounded-xl border-2 border-gray-700/50
+            hover:bg-gray-700/30 hover:border-gray-600/70 transition-all duration-300 text-gray-300 hover:text-white
+            space-x-2 backdrop-blur-sm;
+        }
+        .link-hover {
+            @apply text-purple-400 hover:text-purple-300 transition duration-300;
+        }
+        .progress-bar {
+            @apply h-2 rounded-full bg-gray-700/50 overflow-hidden backdrop-blur-sm;
+        }
+        .progress-fill {
+            @apply h-full transition-all duration-300;
+        }
+        .checkbox-wrapper {
+            @apply relative flex items-center;
+        }
+        .custom-checkbox {
+            @apply h-5 w-5 rounded border-2 border-gray-700/50 bg-gray-800/30
+            text-purple-500 focus:ring-2 focus:ring-purple-500/50 focus:ring-offset-0
+            hover:border-gray-600/70 transition-all duration-300;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-md w-96">
-            <h1 class="text-2xl font-bold mb-6 text-center">Đăng Ký Tài Khoản</h1>
+<body class="min-h-screen flex items-center justify-center p-6">
+    <div class="glass-card w-full max-w-md p-8 rounded-2xl shadow-2xl">
+        <div class="text-center mb-8">
+            <a href="../index.html" class="inline-block">
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 text-transparent bg-clip-text flex items-center justify-center">
+                    <i class="fas fa-film mr-2"></i>Cinema
+                </h1>
+            </a>
+            <p class="mt-3 text-gray-400">Tạo tài khoản để trải nghiệm dịch vụ của chúng tôi</p>
+        </div>
 
-            <form id="registerForm" class="space-y-4">
-                <div>
-                    <label for="username" class="block text-gray-700 mb-2">Tên đăng nhập</label>
-                    <input type="text"
-                           id="username"
-                           name="username"
-                           required
-                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <form id="registerForm" class="space-y-6">
+            <div class="input-group w-full">
+                <input type="text" id="username" placeholder="Tên đăng nhập" required
+                    class="form-input pl-12">
+                <i class="fas fa-user input-icon"></i>
+            </div>
+
+            <div class="input-group w-full">
+                <input type="text" id="fullName" placeholder="Họ và tên" required
+                    class="form-input pl-12">
+                <i class="fas fa-id-card input-icon"></i>
+            </div>
+
+            <div class="input-group">
+                <input type="email" id="email" placeholder="Email" required
+                    class="form-input pl-12">
+                <i class="fas fa-envelope input-icon"></i>
+            </div>
+
+            <div class="input-group">
+                <input type="tel" id="phoneNumber" placeholder="Số điện thoại" required
+                    class="form-input pl-12">
+                <i class="fas fa-phone input-icon"></i>
+            </div>
+
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Mật khẩu" required
+                    class="form-input pl-12" oninput="checkPasswordStrength(this.value)">
+                <i class="fas fa-lock input-icon"></i>
+            </div>
+
+            <div class="space-y-2">
+                <div class="progress-bar">
+                    <div id="passwordStrength" class="progress-fill" style="width: 0%"></div>
                 </div>
-
-                <div>
-                    <label for="email" class="block text-gray-700 mb-2">Email</label>
-                    <input type="email"
-                           id="email"
-                           name="email"
-                           required
-                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-
-                <div>
-                    <label for="fullName" class="block text-gray-700 mb-2">Họ và tên</label>
-                    <input type="text"
-                           id="fullName"
-                           name="fullName"
-                           required
-                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-
-                <div>
-                    <label for="phoneNumber" class="block text-gray-700 mb-2">Số điện thoại</label>
-                    <input type="tel"
-                           id="phoneNumber"
-                           name="phoneNumber"
-                           required
-                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-
-                <div>
-                    <label for="password" class="block text-gray-700 mb-2">Mật khẩu</label>
-                    <input type="password"
-                           id="password"
-                           name="password"
-                           required
-                           minlength="6"
-                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <p class="text-sm text-gray-500 mt-1">Mật khẩu phải có ít nhất 6 ký tự</p>
-                </div>
-
-                <div>
-                    <label for="confirmPassword" class="block text-gray-700 mb-2">Xác nhận mật khẩu</label>
-                    <input type="password"
-                           id="confirmPassword"
-                           name="confirmPassword"
-                           required
-                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-
-                <div id="error-message" class="text-red-500 text-sm hidden"></div>
-
-                <button type="submit"
-                        class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    Đăng Ký
-                </button>
-            </form>
-
-            <div class="mt-4 text-center">
-                <p class="text-gray-600">
-                    Đã có tài khoản?
-                    <a href="login.html" class="text-blue-500 hover:text-blue-700">Đăng nhập ngay</a>
+                <p id="passwordHint" class="text-xs text-gray-400">
+                    Mật khẩu phải chứa ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số
                 </p>
             </div>
-        </div>
+
+            <div class="input-group">
+                <input type="password" id="confirmPassword" placeholder="Xác nhận mật khẩu" required
+                    class="form-input pl-12">
+                <i class="fas fa-lock input-icon"></i>
+            </div>
+
+            <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0">
+                    <input type="checkbox" id="terms" required class="custom-checkbox">
+                </div>
+                <label for="terms" class="text-sm text-gray-400 select-none">
+                    Tôi đồng ý với <a href="#" class="link-hover">Điều khoản sử dụng</a> và
+                    <a href="#" class="link-hover">Chính sách bảo mật</a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn-primary">
+                <span class="flex items-center justify-center">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Đăng Ký
+                </span>
+            </button>
+
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-700/50"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-4 text-gray-400 bg-[#111928]">Hoặc đăng ký với</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <button type="button" class="social-btn group">
+                    <i class="fab fa-google group-hover:scale-110 transition-transform duration-300"></i>
+                    <span>Google</span>
+                </button>
+                <button type="button" class="social-btn group">
+                    <i class="fab fa-facebook-f group-hover:scale-110 transition-transform duration-300"></i>
+                    <span>Facebook</span>
+                </button>
+            </div>
+        </form>
+
+        <p class="mt-8 text-center text-gray-400">
+            Đã có tài khoản?
+            <a href="login.html" class="link-hover font-medium">Đăng nhập ngay</a>
+        </p>
     </div>
 
     <script>
         const API_URL = 'http://localhost:8080';
 
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
+        function checkPasswordStrength(password) {
+            const strengthBar = document.getElementById('passwordStrength');
+            const hint = document.getElementById('passwordHint');
+
+            // Tiêu chí đánh giá
+            const hasLower = /[a-z]/.test(password);
+            const hasUpper = /[A-Z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            const isLongEnough = password.length >= 8;
+
+            let strength = 0;
+            if (hasLower) strength += 20;
+            if (hasUpper) strength += 20;
+            if (hasNumber) strength += 20;
+            if (hasSpecial) strength += 20;
+            if (isLongEnough) strength += 20;
+
+            // Cập nhật thanh tiến trình
+            strengthBar.style.width = `${strength}%`;
+
+            // Cập nhật màu sắc dựa trên độ mạnh
+            if (strength <= 20) {
+                strengthBar.className = 'progress-fill bg-red-500';
+                hint.textContent = 'Mật khẩu quá yếu';
+            } else if (strength <= 40) {
+                strengthBar.className = 'progress-fill bg-orange-500';
+                hint.textContent = 'Mật khẩu yếu';
+            } else if (strength <= 60) {
+                strengthBar.className = 'progress-fill bg-yellow-500';
+                hint.textContent = 'Mật khẩu trung bình';
+            } else if (strength <= 80) {
+                strengthBar.className = 'progress-fill bg-lime-500';
+                hint.textContent = 'Mật khẩu mạnh';
+            } else {
+                strengthBar.className = 'progress-fill bg-green-500';
+                hint.textContent = 'Mật khẩu rất mạnh';
+            }
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
             const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
             const phoneNumber = document.getElementById('phoneNumber').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            const errorDiv = document.getElementById('error-message');
 
-            // Kiểm tra mật khẩu khớp nhau
             if (password !== confirmPassword) {
-                errorDiv.textContent = 'Mật khẩu xác nhận không khớp';
-                errorDiv.classList.remove('hidden');
+                alert('Mật khẩu xác nhận không khớp');
                 return;
             }
 
-            // Kiểm tra định dạng email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                errorDiv.textContent = 'Email không hợp lệ';
-                errorDiv.classList.remove('hidden');
-                return;
-            }
+            try {
+                const response = await fetch(`${API_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        password,
+                        fullName,
+                        phoneNumber,
+                        roles: ['ROLE_USER']
+                    })
+                });
 
-            // Kiểm tra định dạng số điện thoại
-            const phoneRegex = /^[0-9]{10}$/;
-            if (!phoneRegex.test(phoneNumber)) {
-                errorDiv.textContent = 'Số điện thoại không hợp lệ (phải có 10 chữ số)';
-                errorDiv.classList.remove('hidden');
-                return;
-            }
-
-            const registerData = {
-                username,
-                email,
-                fullName,
-                phoneNumber,
-                password
-            };
-
-            fetch(`${API_URL}/api/auth/register`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(registerData)
-            })
-            .then(response => {
                 if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(text || 'Đăng ký thất bại');
-                    });
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Đăng ký thất bại. Vui lòng thử lại.');
                 }
-                return response.json();
-            })
-            .then(data => {
-                alert('Đăng ký thành công! Vui lòng đăng nhập.');
+
+                const data = await response.json();
+                alert('Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.');
                 window.location.href = 'login.html';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                errorDiv.textContent = error.message || 'Có lỗi xảy ra khi đăng ký';
-                errorDiv.classList.remove('hidden');
-            });
+            } catch (error) {
+                alert(error.message);
+            }
         });
     </script>
 </body>

@@ -129,6 +129,14 @@ public class MovieService {
         return convertToDTO(updatedMovie);
     }
 
+    public List<String> getAllUniqueGenres() {
+        return movieRepository.findAll().stream()
+                .map(Movie::getGenre)
+                .filter(genre -> genre != null && !genre.isEmpty())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
     private MovieDTO convertToDTO(Movie movie) {
         MovieDTO dto = new MovieDTO();
         dto.setId(movie.getId());
