@@ -32,5 +32,6 @@ public class Ticket {
     @Column(nullable = false)
     private String status; // BOOKED, PAID, CANCELLED
 
+    @Column(columnDefinition = "TEXT")
     private String qrCode;
 }

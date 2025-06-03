@@ -9,15 +9,23 @@ import com.cinema.model.User;
 import com.cinema.repository.ScreeningRepository;
 import com.cinema.repository.TicketRepository;
 import com.cinema.repository.UserRepository;
+import com.google.zxing.WriterException;
+import jakarta.mail.MessagingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class TicketService {
+    private static final Logger logger = LoggerFactory.getLogger(TicketService.class);
+
     @Autowired
     private TicketRepository ticketRepository;
 
@@ -27,37 +35,81 @@ public class TicketService {
     @Autowired
     private ScreeningRepository screeningRepository;
 
+    @Autowired
+    private QRCodeService qrCodeService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Value("${bank.account.number}")
+    private String bankAccountNumber;
+
+    @Value("${bank.account.name}")
+    private String bankAccountName;
+
     @Transactional
     public TicketDTO bookTicket(Long userId, Long screeningId, String seatNumber) {
+        logger.debug("Bắt đầu đặt vé cho user {} suất chiếu {} ghế {}", userId, screeningId, seatNumber);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        logger.debug("Tìm thấy user: {}", user.getUsername());
 
         Screening screening = screeningRepository.findById(screeningId)
                 .orElseThrow(() -> new ResourceNotFoundException("Screening", "id", screeningId));
+        logger.debug("Tìm thấy suất chiếu: {} - Phim: {}", screening.getId(),
+            screening.getMovie() != null ? screening.getMovie().getTitle() : "null");
+
+        if (screening.getMovie() == null) {
+            throw new BusinessLogicException("Không tìm thấy thông tin phim cho suất chiếu này");
+        }
 
         if (ticketRepository.existsByScreeningIdAndSeatNumber(screeningId, seatNumber)) {
-            throw new BusinessLogicException("Seat " + seatNumber + " is already booked");
+            throw new BusinessLogicException("Ghế " + seatNumber + " đã được đặt");
         }
 
         if (screening.getAvailableSeats() <= 0) {
-            throw new BusinessLogicException("No seats available for this screening");
+            throw new BusinessLogicException("Đã hết ghế cho suất chiếu này");
         }
 
-        Ticket ticket = new Ticket();
-        ticket.setUser(user);
-        ticket.setScreening(screening);
-        ticket.setSeatNumber(seatNumber);
-        ticket.setBookingTime(LocalDateTime.now());
-        ticket.setPrice(screening.getPrice());
-        ticket.setStatus("BOOKED");
+        try {
+            Ticket ticket = new Ticket();
+            ticket.setUser(user);
+            ticket.setScreening(screening);
+            ticket.setSeatNumber(seatNumber);
+            ticket.setBookingTime(LocalDateTime.now());
+            ticket.setPrice(screening.getPrice());
+            ticket.setStatus("PENDING_PAYMENT");
 
-        ticket.setQrCode(generateQRCode(ticket));
+            // Tạo mã QR cho thanh toán
+            String description = String.format("Thanh toan ve xem phim %s - Ghe %s",
+                screening.getMovie().getTitle(), seatNumber);
+            logger.debug("Tạo mã QR với description: {}", description);
 
-        screening.setAvailableSeats(screening.getAvailableSeats() - 1);
-        screeningRepository.save(screening);
+            String qrCodeBase64 = qrCodeService.generatePaymentQRCode(
+                ticket.getPrice(),
+                description
+            );
+            ticket.setQrCode(qrCodeBase64);
 
-        Ticket savedTicket = ticketRepository.save(ticket);
-        return convertToDTO(savedTicket);
+            // Lưu vé vào database
+            Ticket savedTicket = ticketRepository.save(ticket);
+            logger.debug("Đã lưu vé với ID: {}", savedTicket.getId());
+
+            // Cập nhật số ghế còn trống
+            screening.setAvailableSeats(screening.getAvailableSeats() - 1);
+            screeningRepository.save(screening);
+
+            // Gửi email xác nhận
+            emailService.sendTicketConfirmation(savedTicket, qrCodeBase64);
+            logger.debug("Đã gửi email xác nhận");
+
+            return convertToDTO(savedTicket);
+
+        } catch (Exception e) {
+            logger.error("Lỗi khi đặt vé: ", e);
+            throw new BusinessLogicException("Có lỗi xảy ra khi xử lý đặt vé: " + e.getMessage());
+        }
     }
 
     @Transactional
@@ -105,10 +157,6 @@ public class TicketService {
         ticket.setStatus(status);
         Ticket updatedTicket = ticketRepository.save(ticket);
         return convertToDTO(updatedTicket);
-    }
-
-    private String generateQRCode(Ticket ticket) {
-        return "QR_" + ticket.getScreening().getId() + "_" + ticket.getSeatNumber();
     }
 
     private TicketDTO convertToDTO(Ticket ticket) {

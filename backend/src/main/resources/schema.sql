@@ -48,7 +48,7 @@ CREATE TABLE tickets (
     booking_time TIMESTAMP NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     status VARCHAR(255) NOT NULL DEFAULT 'BOOKED',
-    qr_code VARCHAR(255),
+    qr_code TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (screening_id) REFERENCES screenings(id)
 );
