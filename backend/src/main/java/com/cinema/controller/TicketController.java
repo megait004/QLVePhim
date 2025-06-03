@@ -85,6 +85,22 @@ public class TicketController {
         }
     }
 
+    @GetMapping("/screening/{screeningId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<?> getScreeningTickets(@PathVariable Long screeningId) {
+        try {
+            logger.info("Fetching tickets for screening: {}", screeningId);
+            List<TicketDTO> tickets = ticketService.getTicketsByScreeningId(screeningId);
+            return ResponseEntity.ok(tickets);
+        } catch (ResourceNotFoundException e) {
+            logger.error("Failed to get screening tickets: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Unexpected error while getting screening tickets", e);
+            return ResponseEntity.internalServerError().body("An unexpected error occurred");
+        }
+    }
+
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?> updateTicketStatus(

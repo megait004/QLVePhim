@@ -22,6 +22,10 @@ public class ScreeningService {
     private MovieRepository movieRepository;
 
     public ScreeningDTO createScreening(ScreeningDTO screeningDTO) {
+        if (screeningDTO.getId() != null) {
+            return updateScreening(screeningDTO);
+        }
+
         Movie movie = movieRepository.findById(screeningDTO.getMovieId())
                 .orElseThrow(() -> new ResourceNotFoundException("Movie", "id", screeningDTO.getMovieId()));
 
@@ -36,6 +40,23 @@ public class ScreeningService {
         return convertToDTO(savedScreening);
     }
 
+    private ScreeningDTO updateScreening(ScreeningDTO screeningDTO) {
+        Screening existingScreening = screeningRepository.findById(screeningDTO.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Screening", "id", screeningDTO.getId()));
+
+        Movie movie = movieRepository.findById(screeningDTO.getMovieId())
+                .orElseThrow(() -> new ResourceNotFoundException("Movie", "id", screeningDTO.getMovieId()));
+
+        existingScreening.setMovie(movie);
+        existingScreening.setStartTime(screeningDTO.getStartTime());
+        existingScreening.setHallNumber(screeningDTO.getHallNumber());
+        existingScreening.setPrice(screeningDTO.getPrice());
+        existingScreening.setAvailableSeats(screeningDTO.getAvailableSeats());
+
+        Screening updatedScreening = screeningRepository.save(existingScreening);
+        return convertToDTO(updatedScreening);
+    }
+
     @Transactional
     public List<ScreeningDTO> createScreenings(List<ScreeningDTO> screeningDTOs) {
         return screeningDTOs.stream()
@@ -44,7 +65,6 @@ public class ScreeningService {
     }
 
     public List<ScreeningDTO> getScreeningsByMovie(Long movieId) {
-        // Verify movie exists
         if (!movieRepository.existsById(movieId)) {
             throw new ResourceNotFoundException("Movie", "id", movieId);
         }

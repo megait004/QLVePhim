@@ -1,8 +1,8 @@
 {
-    "username": "huenguyen",
-    "email": "huenguyen@gmail.com",
-    "password": "password123",
-    "fullName": "Hue Nguyen",
+    "username": "giap",
+    "email": "giap@gmail.com",
+    "password": "1",
+    "fullName": "Giap Nguyen",
     "phoneNumber": "1234567890",
     "roles": ["ROLE_USER"]
 }

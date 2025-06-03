@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký - Cinema</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-md w-96">
+            <h1 class="text-2xl font-bold mb-6 text-center">Đăng Ký Tài Khoản</h1>
+
+            <form id="registerForm" class="space-y-4">
+                <div>
+                    <label for="username" class="block text-gray-700 mb-2">Tên đăng nhập</label>
+                    <input type="text"
+                           id="username"
+                           name="username"
+                           required
+                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="email" class="block text-gray-700 mb-2">Email</label>
+                    <input type="email"
+                           id="email"
+                           name="email"
+                           required
+                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="fullName" class="block text-gray-700 mb-2">Họ và tên</label>
+                    <input type="text"
+                           id="fullName"
+                           name="fullName"
+                           required
+                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="phoneNumber" class="block text-gray-700 mb-2">Số điện thoại</label>
+                    <input type="tel"
+                           id="phoneNumber"
+                           name="phoneNumber"
+                           required
+                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-gray-700 mb-2">Mật khẩu</label>
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           required
+                           minlength="6"
+                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-sm text-gray-500 mt-1">Mật khẩu phải có ít nhất 6 ký tự</p>
+                </div>
+
+                <div>
+                    <label for="confirmPassword" class="block text-gray-700 mb-2">Xác nhận mật khẩu</label>
+                    <input type="password"
+                           id="confirmPassword"
+                           name="confirmPassword"
+                           required
+                           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div id="error-message" class="text-red-500 text-sm hidden"></div>
+
+                <button type="submit"
+                        class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    Đăng Ký
+                </button>
+            </form>
+
+            <div class="mt-4 text-center">
+                <p class="text-gray-600">
+                    Đã có tài khoản?
+                    <a href="login.html" class="text-blue-500 hover:text-blue-700">Đăng nhập ngay</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const fullName = document.getElementById('fullName').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorDiv = document.getElementById('error-message');
+
+            // Kiểm tra mật khẩu khớp nhau
+            if (password !== confirmPassword) {
+                errorDiv.textContent = 'Mật khẩu xác nhận không khớp';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            // Kiểm tra định dạng email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorDiv.textContent = 'Email không hợp lệ';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            // Kiểm tra định dạng số điện thoại
+            const phoneRegex = /^[0-9]{10}$/;
+            if (!phoneRegex.test(phoneNumber)) {
+                errorDiv.textContent = 'Số điện thoại không hợp lệ (phải có 10 chữ số)';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
+            const registerData = {
+                username,
+                email,
+                fullName,
+                phoneNumber,
+                password
+            };
+
+            fetch(`${API_URL}/api/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(registerData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text || 'Đăng ký thất bại');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Đăng ký thành công! Vui lòng đăng nhập.');
+                window.location.href = 'login.html';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                errorDiv.textContent = error.message || 'Có lỗi xảy ra khi đăng ký';
+                errorDiv.classList.remove('hidden');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 package com.cinema.dto.request;
 
+import com.cinema.model.MovieStatus;
 import lombok.Data;
 import java.time.LocalDate;
 
@@ -7,7 +8,7 @@ import java.time.LocalDate;
 public class MovieSearchRequest {
     private String title;
     private String genre;
-    private Boolean isShowing;
+    private MovieStatus status;
     private LocalDate fromDate;
     private LocalDate toDate;
 }

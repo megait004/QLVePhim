@@ -1,6 +1,7 @@
 # Hướng dẫn Kiểm thử API
 
 ## Cấu trúc Thư mục
+
 ```
 test-data/
 ├── admin/           # Dữ liệu kiểm thử cho thao tác admin
@@ -21,8 +22,10 @@ test-data/
 ```
 
 ## Cài đặt
+
 1. Khởi động ứng dụng
 2. Đặt token JWT của bạn như một biến môi trường:
+
 ```cmd
 set TOKEN=token của admin hoặc user
 ```
@@ -32,6 +35,7 @@ set TOKEN=token của admin hoặc user
 ### 1. Thao tác Công khai (Không yêu cầu xác thực)
 
 #### 1.1 Thao tác với Phim
+
 ```cmd
 # Lấy tất cả phim
 curl -X GET http://localhost:8080/api/movies/public/all
@@ -52,6 +56,7 @@ curl -X POST http://localhost:8080/api/movies/public/search -H "Content-Type: ap
 ### 2. Thao tác Người dùng (Yêu cầu xác thực)
 
 #### 2.1 Xác thực
+
 ```cmd
 # Đăng ký người dùng mới
 curl -X POST http://localhost:8080/api/auth/register -H "Content-Type: application/json" -d @test-data/user/register.json
@@ -67,6 +72,7 @@ curl -X GET http://localhost:8080/api/users/profile -H "Authorization: Bearer %T
 ```
 
 #### 2.2 Thao tác với Vé
+
 ```cmd
 # Đặt một vé
 curl -X POST http://localhost:8080/api/tickets/book -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d @test-data/user/book-ticket.json
@@ -87,12 +93,14 @@ curl -X PUT http://localhost:8080/api/tickets/1/status -H "Authorization: Bearer
 ### 3. Thao tác Admin (Yêu cầu xác thực Admin)
 
 #### 3.1 Xác thực Admin
+
 ```cmd
 # Đăng ký tài khoản admin
 curl -X POST http://localhost:8080/api/auth/register -H "Content-Type: application/json" -d @test-data/admin/register-admin.json
 ```
 
 #### 3.2 Quản lý Phim
+
 ```cmd
 # Tạo phim mới
 curl -X POST http://localhost:8080/api/movies -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d @test-data/admin/create-movie.json
@@ -105,6 +113,7 @@ curl -X DELETE http://localhost:8080/api/movies/1 -H "Authorization: Bearer %TOK
 ```
 
 #### 3.3 Quản lý Suất chiếu
+
 ```cmd
 # Tạo suất chiếu mới
 curl -X POST http://localhost:8080/api/screenings -H "Authorization: Bearer %TOKEN%" -H "Content-Type: application/json" -d @test-data/admin/create-screening.json
@@ -117,6 +126,7 @@ curl -X DELETE http://localhost:8080/api/screenings/1 -H "Authorization: Bearer 
 ```
 
 ### 4. Thao tác với Suất chiếu
+
 ```cmd
 # Lấy thông tin suất chiếu theo ID
 curl -X GET http://localhost:8080/api/screenings/1 -H "Authorization: Bearer %TOKEN%"
@@ -125,12 +135,13 @@ curl -X GET http://localhost:8080/api/screenings/1 -H "Authorization: Bearer %TO
 curl -X GET http://localhost:8080/api/screenings/movie/1 -H "Authorization: Bearer %TOKEN%"
 
 # Lấy danh sách suất chiếu theo khoảng thời gian
-curl -X GET "http://localhost:8080/api/screenings/date-range?start=2024-03-20T00:00:00&end=2024-03-21T23:59:59" -H "Authorization: Bearer %TOKEN%"
+curl -X GET "http://localhost:8080/api/screenings/date-range?start=2025-05-10T00:00:00&end=2025-05-17T23:59:59" -H "Authorization: Bearer %TOKEN%"
 ```
 
 ## Mô tả File Dữ liệu Kiểm thử
 
 ### Dữ liệu Kiểm thử Admin
+
 - `register-admin.json`: Dữ liệu đăng ký tài khoản admin
 - `create-movie.json`: Dữ liệu tạo phim mới
 - `update-movie.json`: Dữ liệu cập nhật phim
@@ -138,6 +149,7 @@ curl -X GET "http://localhost:8080/api/screenings/date-range?start=2024-03-20T00
 - `create-multiple-screenings.json`: Dữ liệu tạo nhiều suất chiếu
 
 ### Dữ liệu Kiểm thử Người dùng
+
 - `register.json`: Dữ liệu đăng ký người dùng thông thường
 - `login.json`: Thông tin đăng nhập
 - `update-user.json`: Dữ liệu cập nhật thông tin người dùng
@@ -146,9 +158,11 @@ curl -X GET "http://localhost:8080/api/screenings/date-range?start=2024-03-20T00
 - `update-ticket-status.json`: Dữ liệu cập nhật trạng thái vé
 
 ### Dữ liệu Kiểm thử Công khai
+
 - `search-movies.json`: Tiêu chí tìm kiếm phim
 
 ## Lời khuyên khi Kiểm thử
+
 1. Luôn kiểm tra mã trạng thái và nội dung phản hồi
 2. Đối với các endpoint được bảo vệ, đảm bảo token còn hiệu lực và chưa hết hạn
 3. Kiểm thử cả trường hợp thành công và thất bại
@@ -158,6 +172,7 @@ curl -X GET "http://localhost:8080/api/screenings/date-range?start=2024-03-20T00
 7. Xác minh việc xóa theo cascade (ví dụ: xóa phim sẽ xóa các suất chiếu và vé liên quan)
 
 ## Mã Trạng thái HTTP Thông dụng
+
 - 200 OK: Yêu cầu thành công
 - 201 Created: Tạo tài nguyên thành công
 - 400 Bad Request: Dữ liệu đầu vào không hợp lệ

@@ -1,9 +1,3 @@
-DROP TABLE IF EXISTS tickets CASCADE;
-DROP TABLE IF EXISTS screenings CASCADE;
-DROP TABLE IF EXISTS movies CASCADE;
-DROP TABLE IF EXISTS user_roles CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-
 CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
@@ -22,14 +16,18 @@ CREATE TABLE user_roles (
 CREATE TABLE movies (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    description VARCHAR(1000),
-    genre VARCHAR(255) NOT NULL,
-    duration INTEGER NOT NULL,
-    release_date DATE NOT NULL,
+    description TEXT,
     director VARCHAR(255) NOT NULL,
     movie_cast VARCHAR(255),
+    duration INTEGER NOT NULL,
+    genre VARCHAR(255) NOT NULL,
+    language VARCHAR(255),
+    rating VARCHAR(255),
+    trailer_url VARCHAR(255),
     poster_url VARCHAR(255) NOT NULL,
-    is_showing BOOLEAN NOT NULL
+    release_date TIMESTAMP NOT NULL,
+    status VARCHAR(255) NOT NULL DEFAULT 'COMING_SOON',
+    CONSTRAINT check_status CHECK (status IN ('NOW_SHOWING', 'COMING_SOON', 'HOT', 'ENDED'))
 );
 
 CREATE TABLE screenings (

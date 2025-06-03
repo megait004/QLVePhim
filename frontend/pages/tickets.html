@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vé Của Tôi - Cinema</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="../index.html" class="text-2xl font-bold">Cinema</a>
+            <div class="space-x-4">
+                <a href="../movies.html" class="hover:text-blue-200">Phim</a>
+                <a href="../screenings.html" class="hover:text-blue-200">Lịch Chiếu</a>
+                <a href="profile.html" class="hover:text-blue-200">Hồ Sơ</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold mb-6">Vé Của Tôi</h1>
+
+        <div id="tickets-container" class="space-y-4">
+            <div class="text-center">
+                <div class="spinner mx-auto"></div>
+                <p class="mt-2">Đang tải danh sách vé...</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        function formatDateTime(dateTimeStr) {
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return new Date(dateTimeStr).toLocaleDateString('vi-VN', options);
+        }
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(price);
+        }
+
+        function loadUserTickets() {
+            // Đầu tiên lấy thông tin user
+            fetch(`${API_URL}/api/users/profile`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Không thể lấy thông tin người dùng');
+                }
+                return response.json();
+            })
+            .then(user => {
+                // Sau đó lấy danh sách vé của user
+                return fetch(`${API_URL}/api/tickets/user/${user.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Không thể lấy danh sách vé');
+                }
+                return response.json();
+            })
+            .then(tickets => {
+                const container = document.getElementById('tickets-container');
+
+                if (!tickets || tickets.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center text-gray-500">
+                            <p>Bạn chưa có vé nào.</p>
+                            <a href="../screenings.html" class="mt-4 inline-block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
+                                Đặt vé ngay
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Nhóm vé theo suất chiếu
+                const ticketsByScreening = {};
+                tickets.forEach(ticket => {
+                    if (!ticketsByScreening[ticket.screeningId]) {
+                        ticketsByScreening[ticket.screeningId] = {
+                            tickets: []
+                        };
+                        // Fetch screening details
+                        fetch(`${API_URL}/api/screenings/${ticket.screeningId}`, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(screening => {
+                            ticketsByScreening[ticket.screeningId].screening = screening;
+                            updateTicketDisplay();
+                        })
+                        .catch(error => {
+                            console.error('Error fetching screening:', error);
+                        });
+                    }
+                    ticketsByScreening[ticket.screeningId].tickets.push(ticket);
+                });
+
+                function updateTicketDisplay() {
+                    container.innerHTML = Object.values(ticketsByScreening).map(group => `
+                        <div class="bg-white rounded-lg shadow-lg p-6">
+                            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
+                                <div>
+                                    ${group.screening ? `
+                                        <h2 class="text-2xl font-bold mb-2">${group.screening.movieTitle || 'Không có thông tin phim'}</h2>
+                                        <p class="text-gray-600">Thời gian: ${formatDateTime(group.screening.startTime)}</p>
+                                        <p class="text-gray-600">Phòng: ${group.screening.hallNumber || 'Chưa cập nhật'}</p>
+                                    ` : `
+                                        <p class="text-gray-600">Đang tải thông tin suất chiếu...</p>
+                                    `}
+                                </div>
+                                <div class="space-y-2">
+                                    ${group.tickets.map(ticket => `
+                                        <div class="bg-gray-50 p-4 rounded">
+                                            <p class="font-semibold">Mã vé: ${ticket.qrCode || 'Không có mã'}</p>
+                                            <p>Ghế: ${ticket.seatNumber || 'Chưa cập nhật'}</p>
+                                            <p>Giá: ${formatPrice(ticket.price || 0)}</p>
+                                            <p class="mt-2">
+                                                <span class="px-2 py-1 rounded ${
+                                                    ticket.status === 'BOOKED' ? 'bg-green-100 text-green-800' :
+                                                    ticket.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
+                                                    'bg-gray-100 text-gray-800'
+                                                }">
+                                                    ${
+                                                        ticket.status === 'BOOKED' ? 'Đã đặt' :
+                                                        ticket.status === 'CANCELLED' ? 'Đã hủy' :
+                                                        ticket.status || 'Không xác định'
+                                                    }
+                                                </span>
+                                            </p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // Initial display
+                updateTicketDisplay();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('tickets-container').innerHTML = `
+                    <div class="text-center text-red-500">
+                        <p>${error.message}</p>
+                        <button onclick="loadUserTickets()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+                            Thử lại
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // Load tickets when page loads
+        loadUserTickets();
+    </script>
+</body>
+</html>

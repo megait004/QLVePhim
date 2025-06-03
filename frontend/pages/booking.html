@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt Vé - Cinema</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="../index.html" class="text-2xl font-bold">Cinema</a>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-4">
+        <div id="booking-content" class="bg-white rounded-lg shadow-lg p-6">
+            <div class="text-center">
+                <div class="spinner mx-auto"></div>
+                <p class="mt-2">Đang tải thông tin suất chiếu...</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+        const screeningId = new URLSearchParams(window.location.search).get('screeningId');
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        function formatDateTime(dateTimeStr) {
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return new Date(dateTimeStr).toLocaleDateString('vi-VN', options);
+        }
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(price);
+        }
+
+        function loadScreeningDetails() {
+            Promise.all([
+                fetch(`${API_URL}/api/screenings/${screeningId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Không thể tải thông tin suất chiếu');
+                    }
+                    return response.json();
+                }).then(screening => {
+                    // Fetch movie details if not included in screening
+                    if (!screening.movie) {
+                        return fetch(`${API_URL}/api/movies/public/${screening.movieId}`, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                console.error('Failed to fetch movie details:', response.status);
+                                // Return a minimal movie object if movie fetch fails
+                                return {
+                                    id: screening.movieId,
+                                    title: 'Đang tải thông tin phim...',
+                                    posterUrl: null
+                                };
+                            }
+                            return response.json();
+                        })
+                        .then(movie => ({
+                            ...screening,
+                            movie: movie
+                        }))
+                        .catch(error => {
+                            console.error('Error fetching movie details:', error);
+                            // Return screening with minimal movie object on error
+                            return {
+                                ...screening,
+                                movie: {
+                                    id: screening.movieId,
+                                    title: 'Đang tải thông tin phim...',
+                                    posterUrl: null
+                                }
+                            };
+                        });
+                    }
+                    return screening;
+                }),
+                fetch(`${API_URL}/api/tickets/screening/${screeningId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }).then(response => {
+                    if (!response.ok) {
+                        if (response.status === 403) {
+                            throw new Error('Bạn không có quyền truy cập thông tin này');
+                        }
+                        throw new Error('Không thể tải thông tin vé');
+                    }
+                    return response.json();
+                })
+            ])
+            .then(([screening, bookedTickets]) => {
+                if (!screening) {
+                    throw new Error('Không thể tải thông tin suất chiếu');
+                }
+
+                const movie = screening.movie || {
+                    title: 'Đang tải thông tin phim...',
+                    posterUrl: null
+                };
+                const occupiedSeats = bookedTickets ? bookedTickets.map(ticket => ticket.seatNumber) : [];
+
+                const bookingContent = document.getElementById('booking-content');
+                bookingContent.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="md:col-span-1">
+                            <img src="${movie.posterUrl ? `${API_URL}/${movie.posterUrl.replace(/^\//, '')}` : `${API_URL}/images/movie-posters/default.jpg`}"
+                                 alt="${movie.title || 'Movie poster'}"
+                                 class="w-full rounded-lg shadow-md"
+                                 onerror="this.src='${API_URL}/images/movie-posters/default.jpg'">
+                        </div>
+                        <div class="md:col-span-2">
+                            <h1 class="text-3xl font-bold mb-4">${movie.title || 'Đang tải...'}</h1>
+                            <div class="space-y-4 mb-6">
+                                <p><span class="font-semibold">Thời gian:</span> ${formatDateTime(screening.startTime)}</p>
+                                <p><span class="font-semibold">Phòng:</span> ${screening.hallNumber || 'N/A'}</p>
+                                <p><span class="font-semibold">Giá vé:</span> ${formatPrice(screening.price || 0)} VND</p>
+                                <p><span class="font-semibold">Ghế trống:</span> ${screening.availableSeats || 0}</p>
+                            </div>
+
+                            <div class="mb-6">
+                                <h2 class="text-xl font-semibold mb-4">Chọn ghế</h2>
+                                <div class="mb-4">
+                                    <div class="flex items-center space-x-4 mb-2">
+                                        <div class="flex items-center">
+                                            <div class="seat"></div>
+                                            <span class="ml-2">Ghế trống</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="seat selected"></div>
+                                            <span class="ml-2">Ghế đã chọn</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <div class="seat occupied"></div>
+                                            <span class="ml-2">Ghế đã đặt</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mb-8">
+                                        <div class="inline-block bg-gray-200 px-8 py-4 rounded-lg">MÀN HÌNH</div>
+                                    </div>
+                                    <div id="seating-layout" class="grid grid-cols-8 gap-2 justify-center">
+                                        ${generateSeatingLayout(occupiedSeats)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h2 class="text-xl font-semibold mb-4">Ghế đã chọn</h2>
+                                <div id="selected-seats" class="text-lg font-medium text-blue-600">
+                                    Chưa chọn ghế nào
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h2 class="text-xl font-semibold mb-4">Tổng tiền</h2>
+                                <p class="text-2xl font-bold text-blue-600" id="total-price">
+                                    ${formatPrice(0)} VND
+                                </p>
+                            </div>
+
+                            <button onclick="confirmBooking()"
+                                    class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                    id="confirm-booking-btn"
+                                    disabled>
+                                Xác nhận đặt vé
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Initialize seat selection functionality
+                window.screeningData = {
+                    price: screening.price,
+                    availableSeats: screening.availableSeats,
+                    selectedSeats: new Set()
+                };
+
+                // Add click event listeners to seats
+                document.querySelectorAll('.seat:not(.occupied)').forEach(seat => {
+                    seat.addEventListener('click', () => toggleSeatSelection(seat));
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('booking-content').innerHTML = `
+                    <div class="text-center text-red-500">
+                        <p>${error.message}</p>
+                        <button onclick="window.history.back()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+                            Quay lại
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function generateSeatingLayout(occupiedSeats) {
+            const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+            const seatsPerRow = 8;
+            let layout = '';
+
+            rows.forEach(row => {
+                for (let i = 1; i <= seatsPerRow; i++) {
+                    const seatNumber = `${row}${i}`;
+                    const isOccupied = occupiedSeats.includes(seatNumber);
+                    layout += `
+                        <div class="seat ${isOccupied ? 'occupied' : ''}"
+                             data-seat="${seatNumber}">
+                            ${seatNumber}
+                        </div>
+                    `;
+                }
+            });
+
+            return layout;
+        }
+
+        function toggleSeatSelection(seatElement) {
+            const seatNumber = seatElement.dataset.seat;
+
+            if (seatElement.classList.contains('selected')) {
+                seatElement.classList.remove('selected');
+                window.screeningData.selectedSeats.delete(seatNumber);
+            } else {
+                // Check if maximum seats (5) are already selected
+                if (window.screeningData.selectedSeats.size >= 5) {
+                    alert('Bạn chỉ có thể chọn tối đa 5 ghế một lần');
+                    return;
+                }
+                seatElement.classList.add('selected');
+                window.screeningData.selectedSeats.add(seatNumber);
+            }
+
+            updateSelectedSeatsDisplay();
+            updateTotalPrice();
+            updateConfirmButton();
+        }
+
+        function updateSelectedSeatsDisplay() {
+            const selectedSeatsElement = document.getElementById('selected-seats');
+            const selectedSeats = Array.from(window.screeningData.selectedSeats).sort();
+
+            if (selectedSeats.length === 0) {
+                selectedSeatsElement.textContent = 'Chưa chọn ghế nào';
+            } else {
+                selectedSeatsElement.textContent = selectedSeats.join(', ');
+            }
+        }
+
+        function updateTotalPrice() {
+            const totalPrice = window.screeningData.selectedSeats.size * window.screeningData.price;
+            document.getElementById('total-price').textContent = formatPrice(totalPrice) + ' VND';
+        }
+
+        function updateConfirmButton() {
+            const confirmButton = document.getElementById('confirm-booking-btn');
+            confirmButton.disabled = window.screeningData.selectedSeats.size === 0;
+        }
+
+        function confirmBooking() {
+            const token = localStorage.getItem('token');
+
+            // Đầu tiên lấy thông tin user hiện tại
+            fetch(`${API_URL}/api/users/profile`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Không thể lấy thông tin người dùng');
+                }
+                return response.json();
+            })
+            .then(user => {
+                console.log('User info:', user);
+
+                if (!user || !user.id) {
+                    throw new Error('Không tìm thấy thông tin người dùng');
+                }
+
+                // Tạo mảng tickets với đầy đủ thông tin theo cấu trúc database
+                const currentTime = new Date().toISOString();
+                const tickets = Array.from(window.screeningData.selectedSeats).map(seatNumber => ({
+                    userId: parseInt(user.id),
+                    screeningId: parseInt(screeningId),
+                    seatNumber: seatNumber,
+                    bookingTime: currentTime,
+                    price: window.screeningData.price,
+                    status: "BOOKED",
+                    qrCode: `QR_${user.id}_${screeningId}_${seatNumber}`
+                }));
+
+                console.log('Request payload:', JSON.stringify(tickets, null, 2));
+
+                // Gửi request đặt vé
+                return fetch(`${API_URL}/api/tickets/book/batch`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(tickets)
+                });
+            })
+            .then(async response => {
+                console.log('Booking response:', response);
+                const text = await response.text();
+                console.log('Response text:', text);
+
+                if (!response.ok) {
+                    throw new Error(text || 'Không thể đặt vé');
+                }
+
+                return text ? JSON.parse(text) : {};
+            })
+            .then(result => {
+                console.log('Booking successful:', result);
+                alert('Đặt vé thành công!');
+                window.location.href = 'tickets.html';
+            })
+            .catch(error => {
+                console.error('Booking error:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack
+                });
+
+                if (error.message.includes('người dùng')) {
+                    alert('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+                    window.location.href = 'login.html';
+                } else {
+                    alert('Có lỗi xảy ra khi đặt vé: ' + error.message);
+                }
+            });
+        }
+
+        // Load screening details when page loads
+        loadScreeningDetails();
+    </script>
+</body>
+</html>

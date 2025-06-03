@@ -2,7 +2,7 @@ package com.cinema.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,29 +17,25 @@ public class Movie {
     @Column(nullable = false)
     private String title;
 
-    @Column(length = 1000)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
-    private String genre;
-
-    @Column(nullable = false)
-    private Integer duration; // in minutes
-
-    @Column(nullable = false)
-    private LocalDate releaseDate;
-
-    @Column(nullable = false)
     private String director;
-
     @Column(name = "movie_cast")
-    private String movieCast;
-
-    @Column(nullable = false)
+    private String cast;
+    private Integer duration;
+    private String genre;
+    private String language;
+    private String rating;
+    private String trailerUrl;
     private String posterUrl;
 
     @Column(nullable = false)
-    private Boolean isShowing;
+    private LocalDateTime releaseDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MovieStatus status = MovieStatus.COMING_SOON;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private List<Screening> screenings = new ArrayList<>();

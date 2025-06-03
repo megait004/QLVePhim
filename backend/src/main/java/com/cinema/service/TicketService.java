@@ -82,6 +82,15 @@ public class TicketService {
         return convertToDTO(ticket);
     }
 
+    public List<TicketDTO> getTicketsByScreeningId(Long screeningId) {
+        if (!screeningRepository.existsById(screeningId)) {
+            throw new ResourceNotFoundException("Screening", "id", screeningId);
+        }
+        return ticketRepository.findByScreeningId(screeningId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public TicketDTO updateTicketStatus(Long id, String status) {
         Ticket ticket = ticketRepository.findById(id)
