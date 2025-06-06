@@ -53,7 +53,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5501", "http://localhost:5501"));
+        configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5501", "http://localhost:5501", "http://localhost:8080"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT"));
         configuration.setAllowedHeaders(Arrays.asList(
             "Authorization",
@@ -88,10 +88,14 @@ public class WebSecurityConfig {
                 auth.requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/api/movies/public/**").permitAll()
                     .requestMatchers("/api/screenings/public/**").permitAll()
+                    .requestMatchers("/api/payment/check-status/**").permitAll()
                     .requestMatchers("/uploads/**").permitAll()
                     .requestMatchers("/images/**").permitAll()
                     .requestMatchers("/images/movie-posters/**").permitAll()
                     .requestMatchers("/static/**").permitAll()
+                    .requestMatchers("/*.html").permitAll()
+                    .requestMatchers("/*.js").permitAll()
+                    .requestMatchers("/*.css").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/movies/*/poster").hasAuthority("ROLE_ADMIN")
                     .requestMatchers(HttpMethod.POST, "/api/movies").hasAuthority("ROLE_ADMIN")
                     .requestMatchers(HttpMethod.PUT, "/api/movies/**").hasAuthority("ROLE_ADMIN")

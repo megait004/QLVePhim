@@ -41,6 +41,9 @@ public class TicketService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private PaymentService paymentService;
+
     @Value("${bank.account.number}")
     private String bankAccountNumber;
 
@@ -73,6 +76,7 @@ public class TicketService {
         }
 
         try {
+            // Tạo vé với trạng thái chờ thanh toán
             Ticket ticket = new Ticket();
             ticket.setUser(user);
             ticket.setScreening(screening);
@@ -80,17 +84,6 @@ public class TicketService {
             ticket.setBookingTime(LocalDateTime.now());
             ticket.setPrice(screening.getPrice());
             ticket.setStatus("PENDING_PAYMENT");
-
-            // Tạo mã QR cho thanh toán
-            String description = String.format("Thanh toan ve xem phim %s - Ghe %s",
-                screening.getMovie().getTitle(), seatNumber);
-            logger.debug("Tạo mã QR với description: {}", description);
-
-            String qrCodeBase64 = qrCodeService.generatePaymentQRCode(
-                ticket.getPrice(),
-                description
-            );
-            ticket.setQrCode(qrCodeBase64);
 
             // Lưu vé vào database
             Ticket savedTicket = ticketRepository.save(ticket);
@@ -100,8 +93,16 @@ public class TicketService {
             screening.setAvailableSeats(screening.getAvailableSeats() - 1);
             screeningRepository.save(screening);
 
-            // Gửi email xác nhận
-            emailService.sendTicketConfirmation(savedTicket, qrCodeBase64);
+            // Tạo link thanh toán PayOS
+            String paymentLink = paymentService.createPaymentLink(savedTicket);
+
+            // Lấy QR code từ response của PayOS
+            String qrCode = paymentService.getPaymentQRCode(savedTicket);
+            savedTicket.setQrCode(qrCode);
+            ticketRepository.save(savedTicket);
+
+            // Gửi email xác nhận với QR code
+            emailService.sendTicketConfirmation(savedTicket, qrCode);
             logger.debug("Đã gửi email xác nhận");
 
             return convertToDTO(savedTicket);
@@ -156,6 +157,19 @@ public class TicketService {
 
         ticket.setStatus(status);
         Ticket updatedTicket = ticketRepository.save(ticket);
+        return convertToDTO(updatedTicket);
+    }
+
+    @Transactional
+    public TicketDTO updateTicketStatusByTransaction(String transactionId, String status) {
+        // Tìm vé dựa vào mã giao dịch trong description của QR code
+        Ticket ticket = ticketRepository.findByQrCodeContaining(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", "transactionId", transactionId));
+
+        ticket.setStatus(status);
+        Ticket updatedTicket = ticketRepository.save(ticket);
+
+        logger.info("Updated ticket {} status to {}", ticket.getId(), status);
         return convertToDTO(updatedTicket);
     }
 

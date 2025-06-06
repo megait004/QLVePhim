@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.util.HashSet;
 import java.util.Set;
+import java.math.BigInteger;
 
 @Data
 @Entity

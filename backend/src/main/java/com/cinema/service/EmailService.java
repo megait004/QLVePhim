@@ -61,6 +61,14 @@ public class EmailService {
         content.append("<p style='color: #4b5563; margin-bottom: 15px;'><strong>Vui lòng quét mã QR bên dưới để thanh toán:</strong></p>");
         content.append("<img src='").append(qrCodeUrl).append("' ");
         content.append("alt='QR Code Thanh toán' style='max-width: 300px; width: 100%; height: auto; border: 1px solid #e5e7eb; border-radius: 8px;'/>");
+
+        // Thêm nút kiểm tra thanh toán
+        content.append("<div style='margin-top: 20px;'>");
+        content.append("<p style='color: #4b5563; margin-bottom: 10px;'>Sau khi chuyển khoản, vui lòng nhấn nút bên dưới để kiểm tra trạng thái thanh toán:</p>");
+        content.append("<a href='http://localhost:8080/payment-status.html?ticketId=").append(ticket.getId()).append("' ");
+        content.append("style='display: inline-block; background-color: #6d28d9; color: white; padding: 12px 24px; ");
+        content.append("text-decoration: none; border-radius: 6px; font-weight: bold;'>Kiểm tra thanh toán</a>");
+        content.append("</div>");
         content.append("</div>");
 
         // Footer
