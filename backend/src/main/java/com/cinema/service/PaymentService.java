@@ -84,10 +84,6 @@ public class PaymentService {
             String cancelUrl = "http://localhost:8080/api/payment/cancel?ticketId=" + ticket.getId();
             long expiredAt = System.currentTimeMillis() / 1000 + 15 * 60;
 
-            // Tạo QR code cho thanh toán
-            String qrCode = qrCodeService.generatePaymentQRCode(amount, description);
-            ticket.setQrCode(qrCode);
-
             // Tạo chuỗi để tính signature theo chuẩn PayOS
             String signData = String.format("amount=%d&cancelUrl=%s&description=%s&orderCode=%d&returnUrl=%s",
                 amount,
@@ -148,9 +144,18 @@ public class PaymentService {
                     // Kiểm tra response code từ PayOS
                     String code = (String) responseMap.get("code");
                     if ("00".equals(code)) {
-                        // Thành công - lấy checkoutUrl từ data
+                        // Thành công - lấy checkoutUrl và qrCode từ data
                         Map<String, Object> data = (Map<String, Object>) responseMap.get("data");
                         String checkoutUrl = (String) data.get("checkoutUrl");
+                        String emvQRCode = (String) data.get("qrCode");
+
+                        // Tạo và lưu QR code thành file, lấy URL
+                        String qrCodeUrl = qrCodeService.generateAndSaveQRCode(emvQRCode);
+
+                        // Lưu URL QR code vào ticket
+                        ticket.setQrCode(qrCodeUrl);
+                        ticketRepository.save(ticket);
+
                         logger.info("Successfully created payment link: {}", checkoutUrl);
                         return checkoutUrl;
                     } else {

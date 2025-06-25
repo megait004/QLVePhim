@@ -74,7 +74,6 @@ public class PaymentController {
         }
     }
 }
-
 class PaymentWebhookRequest {
     private String orderCode;
     private String status;

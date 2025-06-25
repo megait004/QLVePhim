@@ -60,7 +60,12 @@ public class EmailService {
         content.append("<div style='text-align: center; margin: 30px 0;'>");
         content.append("<p style='color: #4b5563; margin-bottom: 15px;'><strong>Vui lòng quét mã QR bên dưới để thanh toán:</strong></p>");
         content.append("<img src='").append(qrCodeUrl).append("' ");
-        content.append("alt='QR Code Thanh toán' style='max-width: 300px; width: 100%; height: auto; border: 1px solid #e5e7eb; border-radius: 8px;'/>");
+        content.append("alt='QR Code Thanh toán' style='max-width: 300px; width: 100%; height: auto; border: 1px solid #e5e7eb; border-radius: 8px;' loading='lazy'/>");
+
+        // Thêm link dự phòng
+        content.append("<p style='margin-top: 10px; font-size: 12px;'>");
+        content.append("Nếu không thấy mã QR, vui lòng <a href='").append(qrCodeUrl).append("' target='_blank'>nhấn vào đây</a>");
+        content.append("</p>");
 
         // Thêm nút kiểm tra thanh toán
         content.append("<div style='margin-top: 20px;'>");

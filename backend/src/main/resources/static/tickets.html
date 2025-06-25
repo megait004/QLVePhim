@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vé Của Tôi - Cinema</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .ticket-card {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+        .ticket-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        .ticket-detail {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-primary {
+            @apply bg-purple-500 text-white px-6 py-3 rounded-full hover:bg-purple-600 transition-all duration-300;
+        }
+        .status-badge {
+            @apply px-3 py-1.5 rounded-full text-sm font-medium;
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        .status-badge.booked {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+        }
+        .status-badge.cancelled {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+            color: #EF4444;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 text-white min-h-screen">
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="text-2xl font-bold text-white flex items-center">
+                    <i class="fas fa-film mr-2"></i>
+                    <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">Cinema</span>
+                </a>
+                <div class="flex items-center space-x-8">
+                    <a href="movies.html" class="hover:text-purple-400 transition-colors duration-300">
+                        <i class="fas fa-film mr-2"></i>Phim
+                    </a>
+                    <a href="screenings.html" class="hover:text-purple-400 transition-colors duration-300">
+                        <i class="fas fa-calendar mr-2"></i>Lịch Chiếu
+                    </a>
+                    <a href="profile.html" class="hover:text-purple-400 transition-colors duration-300">
+                        <i class="fas fa-user mr-2"></i>Hồ Sơ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 pt-24 pb-16">
+        <h1 class="text-4xl font-bold mb-8 bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">
+            Vé Của Tôi
+        </h1>
+
+        <div id="tickets-container" class="space-y-6">
+            <div class="text-center py-12">
+                <div class="spinner mx-auto"></div>
+                <p class="mt-4 text-gray-400">Đang tải danh sách vé...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Về Chúng Tôi</h3>
+                    <p class="text-gray-400">Hệ thống rạp chiếu phim hiện đại nhất với công nghệ âm thanh và hình ảnh tuyệt hảo.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Liên Hệ</h3>
+                    <p class="text-gray-400">
+                        <i class="fas fa-phone mr-2"></i> 1900 xxxx<br>
+                        <i class="fas fa-envelope mr-2"></i> support@cinema.com
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Theo Dõi</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-300">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-purple-500 transition-colors duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Cinema. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:8080';
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        function formatDateTime(dateTimeStr) {
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return new Date(dateTimeStr).toLocaleDateString('vi-VN', options);
+        }
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(price);
+        }
+
+        function loadUserTickets() {
+            fetch(`${API_URL}/api/users/profile`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        localStorage.removeItem('token');
+                        window.location.href = 'login.html';
+                        throw new Error('Phiên đăng nhập hết hạn');
+                    }
+                    throw new Error('Không thể lấy thông tin người dùng');
+                }
+                return response.json();
+            })
+            .then(user => {
+                return fetch(`${API_URL}/api/tickets/user/${user.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        localStorage.removeItem('token');
+                        window.location.href = 'login.html';
+                        throw new Error('Phiên đăng nhập hết hạn');
+                    }
+                    throw new Error('Không thể lấy danh sách vé');
+                }
+                return response.json();
+            })
+            .then(tickets => {
+                const container = document.getElementById('tickets-container');
+
+                if (!tickets || tickets.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-16">
+                            <i class="fas fa-ticket-alt text-6xl text-gray-600 mb-4"></i>
+                            <p class="text-gray-400 text-lg mb-6">Bạn chưa có vé nào.</p>
+                            <a href="screenings.html" class="btn-primary">
+                                <i class="fas fa-calendar-plus mr-2"></i>Đặt vé ngay
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const ticketsByScreening = {};
+                tickets.forEach(ticket => {
+                    if (!ticketsByScreening[ticket.screeningId]) {
+                        ticketsByScreening[ticket.screeningId] = {
+                            tickets: []
+                        };
+                        fetch(`${API_URL}/api/screenings/${ticket.screeningId}`, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                if (response.status === 403) {
+                                    localStorage.removeItem('token');
+                                    window.location.href = 'login.html';
+                                    throw new Error('Phiên đăng nhập hết hạn');
+                                }
+                                throw new Error('Không thể lấy thông tin suất chiếu');
+                            }
+                            return response.json();
+                        })
+                        .then(screening => {
+                            ticketsByScreening[ticket.screeningId].screening = screening;
+                            updateTicketDisplay();
+                        })
+                        .catch(error => {
+                            console.error('Lỗi khi lấy thông tin suất chiếu:', error);
+                            showError(error.message);
+                        });
+                    }
+                    ticketsByScreening[ticket.screeningId].tickets.push(ticket);
+                });
+
+                function updateTicketDisplay() {
+                    container.innerHTML = Object.values(ticketsByScreening).map(group => `
+                        <div class="ticket-card rounded-2xl p-6">
+                            <div class="flex flex-col md:flex-row justify-between items-start gap-6">
+                                <div class="flex-1">
+                                    ${group.screening ? `
+                                        <h2 class="text-2xl font-bold mb-4 bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">
+                                            ${group.screening.movieTitle || 'Không có thông tin phim'}
+                                        </h2>
+                                        <div class="space-y-2 text-gray-300">
+                                            <p class="flex items-center">
+                                                <i class="fas fa-clock mr-3 text-purple-400"></i>
+                                                ${formatDateTime(group.screening.startTime)}
+                                            </p>
+                                            <p class="flex items-center">
+                                                <i class="fas fa-door-open mr-3 text-purple-400"></i>
+                                                Phòng ${group.screening.hallNumber || 'Chưa cập nhật'}
+                                            </p>
+                                        </div>
+                                    ` : `
+                                        <div class="animate-pulse">
+                                            <div class="h-6 bg-gray-700 rounded w-3/4 mb-4"></div>
+                                            <div class="h-4 bg-gray-700 rounded w-1/2 mb-2"></div>
+                                            <div class="h-4 bg-gray-700 rounded w-1/3"></div>
+                                        </div>
+                                    `}
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full md:w-auto">
+                                    ${group.tickets.map(ticket => `
+                                        <div class="ticket-detail rounded-xl p-4">
+                                            <div class="flex items-center justify-between mb-3">
+                                                <span class="text-sm text-gray-400">Mã vé</span>
+                                                <span class="font-medium">${ticket.qrCode || 'Không có mã'}</span>
+                                            </div>
+                                            <div class="flex items-center justify-between mb-3">
+                                                <span class="text-sm text-gray-400">Ghế</span>
+                                                <span class="font-medium text-purple-400">${ticket.seatNumber || 'Chưa cập nhật'}</span>
+                                            </div>
+                                            <div class="flex items-center justify-between mb-3">
+                                                <span class="text-sm text-gray-400">Giá vé</span>
+                                                <span class="font-medium">${formatPrice(ticket.price || 0)}</span>
+                                            </div>
+                                            <div class="flex justify-end">
+                                                <span class="status-badge ${
+                                                    ticket.status === 'BOOKED' ? 'booked' :
+                                                    ticket.status === 'CANCELLED' ? 'cancelled' : ''
+                                                }">
+                                                    ${
+                                                        ticket.status === 'BOOKED' ? 'Đã đặt' :
+                                                        ticket.status === 'CANCELLED' ? 'Đã hủy' :
+                                                        ticket.status || 'Không xác định'
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                updateTicketDisplay();
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                showError(error.message);
+            });
+        }
+
+        // Hàm hiển thị lỗi
+        function showError(message) {
+            const container = document.getElementById('tickets-container');
+            container.innerHTML = `
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Lỗi!</strong>
+                    <span class="block sm:inline">${message}</span>
+                </div>
+            `;
+        }
+
+        // Load tickets when page loads
+        loadUserTickets();
+    </script>
+</body>
+</html>

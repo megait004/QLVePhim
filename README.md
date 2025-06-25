@@ -10,7 +10,7 @@ cinema-project/
 │   ├── src/          # Mã nguồn
 │   ├── test-data/    # Dữ liệu test và ví dụ API
 │   └── pom.xml       # Quản lý dependencies Maven
-└── frontend/         # Ứng dụng React (Sắp ra mắt)
+└── frontend/         # HTML, CSS, JavaScript
 ```
 
 ## Backend
@@ -28,6 +28,7 @@ Backend được xây dựng với:
 - Quản lý lịch chiếu
 - Hệ thống đặt vé
 - Quản lý thông tin người dùng
+-Thanh toán online
 
 ### Tài Liệu API
 Tài liệu API chi tiết có thể được tìm thấy trong `backend/test-data/README.md`
@@ -90,10 +91,3 @@ Frontend sẽ được xây dựng bằng React và bao gồm:
 - Đặt nhiều vé
 - Xem lịch sử đặt vé
 - Hủy vé
-
-## Hướng Dẫn Đóng Góp
-1. Fork repository
-2. Tạo nhánh tính năng mới (`git checkout -b feature/TinhNangMoi`)
-3. Commit thay đổi (`git commit -m 'Thêm tính năng mới'`)
-4. Push lên nhánh (`git push origin feature/TinhNangMoi`)
-5. Tạo Pull Request
